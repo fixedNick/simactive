@@ -1,0 +1,13 @@
+version: '3'
+
+tasks:
+  generate:
+    desc: "Compile protobuf files"
+    cmds:
+      - protoc --proto_path=api/protos --go_out=api/generated --go-grpc_out=api/generated sim.proto
+
+  run:
+    desc: "Run SimActive server"
+    dir: "cmd/app"
+    cmds:
+      - go run main.go 

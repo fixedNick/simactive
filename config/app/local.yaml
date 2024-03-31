@@ -1,0 +1,5 @@
+env: "local" # prod
+storage_path: "./storage/simactive.db"
+grpc:
+  port: 50001
+  timeout: 1m

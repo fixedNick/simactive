@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+option go_package = "github.com/fixedNick/SimHelper";
+
+service SimActive {
+    /////////////////////////////////////
+    ////////// METHODS FOR Sim //////////
+    /////////////////////////////////////
+    rpc AddSim (AddSimRequest) returns (AddSimResponse) {}
+    rpc DeleteSim (DeleteSimRequest) returns (DeleteSimResponse) {}
+    rpc ActivateSim (ActivateSimRequest) returns (ActivateSimResponse) {}
+    rpc SetSimBlocked (SSBRequest) returns (SSBResponse) {}
+    rpc GetSimList (Empty) returns (SimList) {}
+    rpc GetFreeServices (GetFreeServRequest) returns (GetFreeServResponse) {}
+    rpc GetUsedServices (GetUsedServRequest) returns (GetUsedServResponse) {}
+
+    /////////////////////////////////////
+    ////////// METHODS FOR Services /////
+    /////////////////////////////////////
+    rpc AddService (AddServiceRequest) returns (AddServiceResponse) {}
+    rpc DeleteService (DeleteServiceRequest) returns (DeleteServiceResponse) {}
+    rpc GetAllServices (Empty) returns (GASResponse) {}
+
+    //////////////////////////////////////
+    ////////// METHODS FOR Used //////////
+    //////////////////////////////////////
+    rpc UseSimForService (USFSRequest) returns (USFSResponse) {} 
+    //rpc BlockSimForService (BlockSSReq) returns (BlockSSResp) {}
+
+    //////////////////////////////////////
+    ////////// METHODS FOR Provider //////
+    //////////////////////////////////////
+    rpc GetProviderList (Empty) returns (ProviderList) {}
+}
+message Empty {}
+
+message SSBRequest {
+    string number = 1;
+}
+message SSBResponse {
+    bool isBlocked = 1;
+}
+message GetUsedServResponse {
+    repeated int32 UsedServiceIds = 1;
+}
+message GetUsedServRequest {
+    string Number = 1;
+}
+message GetFreeServResponse {
+    repeated int32 FreeServiceIds = 1;
+}
+message GetFreeServRequest {
+    string Number = 1;
+}
+message ProviderData {
+    int32 id = 1;
+    string name = 2;
+}
+message ProviderList {
+    repeated ProviderData Providers = 1;
+}
+message SimList {
+    repeated SimData SimList = 1;
+}
+message SimData {
+    string Number = 1;
+    int32 Provider = 2;
+    bool IsActivated = 3;
+    int64 ActivateUntil = 4;
+    bool IsBlocked = 5;
+}
+message USFSRequest {
+    string Number = 1;
+    int32 Service = 2;
+}
+message USFSResponse {
+    bool IsUsed = 1;
+}
+message ActivateSimRequest {
+    string Number = 1;
+}
+message ActivateSimResponse {
+    bool IsActivated = 1;
+}
+message ServiceData {
+    int32 Id = 1;
+    string Name = 2;
+}
+message GASResponse {
+    repeated ServiceData Services = 1;
+}
+message AddServiceRequest {
+    string Name = 1;
+}
+message AddServiceResponse {
+    bool IsAdded = 1;
+
+}
+message DeleteServiceRequest {
+    string Name = 1;
+}
+message DeleteServiceResponse {
+    bool IsDeleted = 1;
+}
+message AddSimData {
+    string Number = 1;
+    string Provider = 2;
+    bool IsActivated = 3;
+    int64 ActivateUntil = 4;
+    bool IsBlocked = 5;
+}
+message AddSimRequest {
+    AddSimData SimData = 1;
+}
+message AddSimResponse {
+    string Message = 1;         // Message of successfull operation
+    bool IsAdded = 2;           // True when operation finished as success
+}
+message DeleteSimRequest {
+    string Number = 1;          // phone number to delete
+}
+
+message DeleteSimResponse {
+    bool IsDeleted = 1;         // Is operation succeed 
+}
