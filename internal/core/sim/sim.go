@@ -1,8 +1,9 @@
 package sim
 
 type Sim struct {
-	id     int
-	number string
+	id         int
+	number     string
+	providerId int
 }
 type SimList map[string]Sim
 
