@@ -2,10 +2,7 @@ syntax = "proto3";
 
 option go_package = "github.com/fixedNick/SimHelper";
 
-service SimActive {
-    /////////////////////////////////////
-    ////////// METHODS FOR Sim //////////
-    /////////////////////////////////////
+service Sim {
     rpc AddSim (AddSimRequest) returns (AddSimResponse) {}
     rpc DeleteSim (DeleteSimRequest) returns (DeleteSimResponse) {}
     rpc ActivateSim (ActivateSimRequest) returns (ActivateSimResponse) {}
@@ -13,25 +10,22 @@ service SimActive {
     rpc GetSimList (Empty) returns (SimList) {}
     rpc GetFreeServices (GetFreeServRequest) returns (GetFreeServResponse) {}
     rpc GetUsedServices (GetUsedServRequest) returns (GetUsedServResponse) {}
+}
 
-    /////////////////////////////////////
-    ////////// METHODS FOR Services /////
-    /////////////////////////////////////
+service Service {
     rpc AddService (AddServiceRequest) returns (AddServiceResponse) {}
     rpc DeleteService (DeleteServiceRequest) returns (DeleteServiceResponse) {}
     rpc GetAllServices (Empty) returns (GASResponse) {}
+}
 
-    //////////////////////////////////////
-    ////////// METHODS FOR Used //////////
-    //////////////////////////////////////
+service Used {
     rpc UseSimForService (USFSRequest) returns (USFSResponse) {} 
-    //rpc BlockSimForService (BlockSSReq) returns (BlockSSResp) {}
+}
 
-    //////////////////////////////////////
-    ////////// METHODS FOR Provider //////
-    //////////////////////////////////////
+service Provider {
     rpc GetProviderList (Empty) returns (ProviderList) {}
 }
+
 message Empty {}
 
 message SSBRequest {
@@ -64,7 +58,7 @@ message SimList {
 }
 message SimData {
     string Number = 1;
-    int32 Provider = 2;
+    int32 ProviderID = 2;
     bool IsActivated = 3;
     int64 ActivateUntil = 4;
     bool IsBlocked = 5;
@@ -104,7 +98,7 @@ message DeleteServiceResponse {
 }
 message AddSimData {
     string Number = 1;
-    string Provider = 2;
+    int32 ProviderID = 2;
     bool IsActivated = 3;
     int64 ActivateUntil = 4;
     bool IsBlocked = 5;

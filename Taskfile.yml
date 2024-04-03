@@ -10,4 +10,4 @@ tasks:
     desc: "Run SimActive server"
     dir: "cmd/app"
     cmds:
-      - go run main.go 
+      - go run main.go "--config=../../config/app/local.yaml"

@@ -1,18 +1,10 @@
-package simrepo
+package repository
 
 import (
 	"database/sql"
 	"log/slog"
-	"simactive/internal/core/sim"
+	"simactive/internal/core"
 )
-
-type SqlRepository interface {
-	Save(s sim.Sim) (id int, err error)
-	Remove(s sim.Sim) error
-	SimList() (*sim.SimList, error)
-	ByID(id int) (sim.Sim, error)
-	ByNumber(number string) (sim.Sim, error)
-}
 
 type SimSqlRepository struct {
 	db     *sql.DB
@@ -27,15 +19,15 @@ func NewSQLRepository(db *sql.DB, logger *slog.Logger) *SimSqlRepository {
 	}
 }
 
-// Saving [s sim.Sim] into database
-// Returns [id] of saved sim
+// Saving [s core.Sim] into database
+// Returns [id] of saved core
 // Return error:
 // 1. Sim already exist
 // 2. Internal error: Executing sql or fetching last insert id
-func (sqlRepo *SimSqlRepository) Save(s sim.Sim) (id int, err error) {
+func (sqlRepo *SimSqlRepository) Save(s core.Sim) (id int, err error) {
 	const op = "sqlRepo.Save()"
 
-	query := "INSERT INTO sim (?, ?, ?, ?, ?, ?)"
+	query := "INSERT INTO sim VALUES (?, ?, ?, ?, ?, ?)"
 	r, err := sqlRepo.db.Exec(query, 0, s.Number(), s.ProviderID(), s.IsActivated(), s.ActivateUntil(), s.IsBlocked())
 	if err != nil {
 		panic("implement")
@@ -49,9 +41,9 @@ func (sqlRepo *SimSqlRepository) Save(s sim.Sim) (id int, err error) {
 	return int(insertedId), nil
 }
 
-// Removes [s sim.Sim] from database using [s.id]
+// Removes [s core.Sim] from database using [s.id]
 // Return only internal (sql) errors
-func (sqlRepo *SimSqlRepository) Remove(s sim.Sim) error {
+func (sqlRepo *SimSqlRepository) Remove(s core.Sim) error {
 	const op = "sqlRepo.Remove()"
 
 	query := "DELETE FROM sim WHERE id = ?"
@@ -68,9 +60,9 @@ func (sqlRepo *SimSqlRepository) Remove(s sim.Sim) error {
 	return nil
 }
 
-// Receiving list [sim.SimList] from db
+// Receiving list [core.SimList] from db
 // Return only internal (sql) errors
-func (sqlRepo *SimSqlRepository) SimList() (*sim.SimList, error) {
+func (sqlRepo *SimSqlRepository) SimList() (*core.SimList, error) {
 	const op = "sqlRepo.SimList()"
 
 	query := `SELECT * FROM sim`
@@ -80,7 +72,7 @@ func (sqlRepo *SimSqlRepository) SimList() (*sim.SimList, error) {
 		panic("implement")
 	}
 
-	simList := sim.NewSimList()
+	coreList := core.NewSimList()
 	for {
 		if !rows.Next() {
 			break
@@ -99,16 +91,16 @@ func (sqlRepo *SimSqlRepository) SimList() (*sim.SimList, error) {
 			panic("implement")
 		}
 
-		simList[number] = sim.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked)
+		coreList[number] = core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked)
 	}
 
-	return &simList, nil
+	return &coreList, nil
 }
 
 // Gets [s Sim] from db by its own [id]
 // Return error sql.ErrNoRows
 // Return internal (sql) errors
-func (sqlRepo *SimSqlRepository) ByID(id int) (sim.Sim, error) {
+func (sqlRepo *SimSqlRepository) ByID(id int) (core.Sim, error) {
 	const op = "sqlRepo.ById()"
 
 	query := "SELECT number, provider_id, is_activated, activate_until, is_blocked FROM sim WHERE id = ?"
@@ -132,13 +124,13 @@ func (sqlRepo *SimSqlRepository) ByID(id int) (sim.Sim, error) {
 		panic("implement internal")
 	}
 
-	return sim.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked), nil
+	return core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked), nil
 }
 
 // Gets [s Sim] from db by its own [number]
 // Return error sql.ErrNoRows
 // Return internal (sql) errors
-func (sqlRepo *SimSqlRepository) ByNumber(number string) (sim.Sim, error) {
+func (sqlRepo *SimSqlRepository) ByNumber(number string) (core.Sim, error) {
 	const op = "sqlRepo.ByNumber()"
 
 	query := "SELECT id, provider_id, is_activated, activate_until, is_blocked FROM sim WHERE number = ?"
@@ -161,5 +153,5 @@ func (sqlRepo *SimSqlRepository) ByNumber(number string) (sim.Sim, error) {
 		panic("implement internal")
 	}
 
-	return sim.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked), nil
+	return core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked), nil
 }

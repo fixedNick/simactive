@@ -1,4 +1,4 @@
-package used
+package core
 
 type Used struct {
 	id        int

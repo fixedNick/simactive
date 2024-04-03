@@ -1,4 +1,4 @@
-package provider
+package core
 
 type Provider struct {
 	id   int

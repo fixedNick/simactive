@@ -1,4 +1,4 @@
-package service
+package core
 
 type Service struct {
 	id   int

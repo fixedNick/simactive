@@ -1,4 +1,4 @@
-package sim
+package core
 
 type Sim struct {
 	id            int
@@ -44,4 +44,7 @@ func (s Sim) IsActivated() bool {
 }
 func (s Sim) ActivateUntil() int64 {
 	return s.activateUntil
+}
+func (s *Sim) SetID(id int) {
+	s.id = id
 }

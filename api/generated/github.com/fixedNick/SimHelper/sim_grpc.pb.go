@@ -18,13 +18,10 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// SimActiveClient is the client API for SimActive service.
+// SimClient is the client API for Sim service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type SimActiveClient interface {
-	// ///////////////////////////////////
-	// //////// METHODS FOR Sim //////////
-	// ///////////////////////////////////
+type SimClient interface {
 	AddSim(ctx context.Context, in *AddSimRequest, opts ...grpc.CallOption) (*AddSimResponse, error)
 	DeleteSim(ctx context.Context, in *DeleteSimRequest, opts ...grpc.CallOption) (*DeleteSimResponse, error)
 	ActivateSim(ctx context.Context, in *ActivateSimRequest, opts ...grpc.CallOption) (*ActivateSimResponse, error)
@@ -32,145 +29,83 @@ type SimActiveClient interface {
 	GetSimList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SimList, error)
 	GetFreeServices(ctx context.Context, in *GetFreeServRequest, opts ...grpc.CallOption) (*GetFreeServResponse, error)
 	GetUsedServices(ctx context.Context, in *GetUsedServRequest, opts ...grpc.CallOption) (*GetUsedServResponse, error)
-	// ///////////////////////////////////
-	// //////// METHODS FOR Services /////
-	// ///////////////////////////////////
-	AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*AddServiceResponse, error)
-	DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*DeleteServiceResponse, error)
-	GetAllServices(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GASResponse, error)
-	// ////////////////////////////////////
-	// //////// METHODS FOR Used //////////
-	// ////////////////////////////////////
-	UseSimForService(ctx context.Context, in *USFSRequest, opts ...grpc.CallOption) (*USFSResponse, error)
-	// ////////////////////////////////////
-	// //////// METHODS FOR Provider //////
-	// ////////////////////////////////////
-	GetProviderList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProviderList, error)
 }
 
-type simActiveClient struct {
+type simClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewSimActiveClient(cc grpc.ClientConnInterface) SimActiveClient {
-	return &simActiveClient{cc}
+func NewSimClient(cc grpc.ClientConnInterface) SimClient {
+	return &simClient{cc}
 }
 
-func (c *simActiveClient) AddSim(ctx context.Context, in *AddSimRequest, opts ...grpc.CallOption) (*AddSimResponse, error) {
+func (c *simClient) AddSim(ctx context.Context, in *AddSimRequest, opts ...grpc.CallOption) (*AddSimResponse, error) {
 	out := new(AddSimResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/AddSim", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/AddSim", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) DeleteSim(ctx context.Context, in *DeleteSimRequest, opts ...grpc.CallOption) (*DeleteSimResponse, error) {
+func (c *simClient) DeleteSim(ctx context.Context, in *DeleteSimRequest, opts ...grpc.CallOption) (*DeleteSimResponse, error) {
 	out := new(DeleteSimResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/DeleteSim", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/DeleteSim", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) ActivateSim(ctx context.Context, in *ActivateSimRequest, opts ...grpc.CallOption) (*ActivateSimResponse, error) {
+func (c *simClient) ActivateSim(ctx context.Context, in *ActivateSimRequest, opts ...grpc.CallOption) (*ActivateSimResponse, error) {
 	out := new(ActivateSimResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/ActivateSim", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/ActivateSim", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) SetSimBlocked(ctx context.Context, in *SSBRequest, opts ...grpc.CallOption) (*SSBResponse, error) {
+func (c *simClient) SetSimBlocked(ctx context.Context, in *SSBRequest, opts ...grpc.CallOption) (*SSBResponse, error) {
 	out := new(SSBResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/SetSimBlocked", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/SetSimBlocked", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) GetSimList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SimList, error) {
+func (c *simClient) GetSimList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SimList, error) {
 	out := new(SimList)
-	err := c.cc.Invoke(ctx, "/SimActive/GetSimList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/GetSimList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) GetFreeServices(ctx context.Context, in *GetFreeServRequest, opts ...grpc.CallOption) (*GetFreeServResponse, error) {
+func (c *simClient) GetFreeServices(ctx context.Context, in *GetFreeServRequest, opts ...grpc.CallOption) (*GetFreeServResponse, error) {
 	out := new(GetFreeServResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/GetFreeServices", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/GetFreeServices", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) GetUsedServices(ctx context.Context, in *GetUsedServRequest, opts ...grpc.CallOption) (*GetUsedServResponse, error) {
+func (c *simClient) GetUsedServices(ctx context.Context, in *GetUsedServRequest, opts ...grpc.CallOption) (*GetUsedServResponse, error) {
 	out := new(GetUsedServResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/GetUsedServices", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Sim/GetUsedServices", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simActiveClient) AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*AddServiceResponse, error) {
-	out := new(AddServiceResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/AddService", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *simActiveClient) DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*DeleteServiceResponse, error) {
-	out := new(DeleteServiceResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/DeleteService", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *simActiveClient) GetAllServices(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GASResponse, error) {
-	out := new(GASResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/GetAllServices", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *simActiveClient) UseSimForService(ctx context.Context, in *USFSRequest, opts ...grpc.CallOption) (*USFSResponse, error) {
-	out := new(USFSResponse)
-	err := c.cc.Invoke(ctx, "/SimActive/UseSimForService", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *simActiveClient) GetProviderList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProviderList, error) {
-	out := new(ProviderList)
-	err := c.cc.Invoke(ctx, "/SimActive/GetProviderList", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// SimActiveServer is the server API for SimActive service.
-// All implementations must embed UnimplementedSimActiveServer
+// SimServer is the server API for Sim service.
+// All implementations must embed UnimplementedSimServer
 // for forward compatibility
-type SimActiveServer interface {
-	// ///////////////////////////////////
-	// //////// METHODS FOR Sim //////////
-	// ///////////////////////////////////
+type SimServer interface {
 	AddSim(context.Context, *AddSimRequest) (*AddSimResponse, error)
 	DeleteSim(context.Context, *DeleteSimRequest) (*DeleteSimResponse, error)
 	ActivateSim(context.Context, *ActivateSimRequest) (*ActivateSimResponse, error)
@@ -178,346 +113,537 @@ type SimActiveServer interface {
 	GetSimList(context.Context, *Empty) (*SimList, error)
 	GetFreeServices(context.Context, *GetFreeServRequest) (*GetFreeServResponse, error)
 	GetUsedServices(context.Context, *GetUsedServRequest) (*GetUsedServResponse, error)
-	// ///////////////////////////////////
-	// //////// METHODS FOR Services /////
-	// ///////////////////////////////////
-	AddService(context.Context, *AddServiceRequest) (*AddServiceResponse, error)
-	DeleteService(context.Context, *DeleteServiceRequest) (*DeleteServiceResponse, error)
-	GetAllServices(context.Context, *Empty) (*GASResponse, error)
-	// ////////////////////////////////////
-	// //////// METHODS FOR Used //////////
-	// ////////////////////////////////////
-	UseSimForService(context.Context, *USFSRequest) (*USFSResponse, error)
-	// ////////////////////////////////////
-	// //////// METHODS FOR Provider //////
-	// ////////////////////////////////////
-	GetProviderList(context.Context, *Empty) (*ProviderList, error)
-	mustEmbedUnimplementedSimActiveServer()
+	mustEmbedUnimplementedSimServer()
 }
 
-// UnimplementedSimActiveServer must be embedded to have forward compatible implementations.
-type UnimplementedSimActiveServer struct {
+// UnimplementedSimServer must be embedded to have forward compatible implementations.
+type UnimplementedSimServer struct {
 }
 
-func (UnimplementedSimActiveServer) AddSim(context.Context, *AddSimRequest) (*AddSimResponse, error) {
+func (UnimplementedSimServer) AddSim(context.Context, *AddSimRequest) (*AddSimResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSim not implemented")
 }
-func (UnimplementedSimActiveServer) DeleteSim(context.Context, *DeleteSimRequest) (*DeleteSimResponse, error) {
+func (UnimplementedSimServer) DeleteSim(context.Context, *DeleteSimRequest) (*DeleteSimResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSim not implemented")
 }
-func (UnimplementedSimActiveServer) ActivateSim(context.Context, *ActivateSimRequest) (*ActivateSimResponse, error) {
+func (UnimplementedSimServer) ActivateSim(context.Context, *ActivateSimRequest) (*ActivateSimResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActivateSim not implemented")
 }
-func (UnimplementedSimActiveServer) SetSimBlocked(context.Context, *SSBRequest) (*SSBResponse, error) {
+func (UnimplementedSimServer) SetSimBlocked(context.Context, *SSBRequest) (*SSBResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSimBlocked not implemented")
 }
-func (UnimplementedSimActiveServer) GetSimList(context.Context, *Empty) (*SimList, error) {
+func (UnimplementedSimServer) GetSimList(context.Context, *Empty) (*SimList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSimList not implemented")
 }
-func (UnimplementedSimActiveServer) GetFreeServices(context.Context, *GetFreeServRequest) (*GetFreeServResponse, error) {
+func (UnimplementedSimServer) GetFreeServices(context.Context, *GetFreeServRequest) (*GetFreeServResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFreeServices not implemented")
 }
-func (UnimplementedSimActiveServer) GetUsedServices(context.Context, *GetUsedServRequest) (*GetUsedServResponse, error) {
+func (UnimplementedSimServer) GetUsedServices(context.Context, *GetUsedServRequest) (*GetUsedServResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsedServices not implemented")
 }
-func (UnimplementedSimActiveServer) AddService(context.Context, *AddServiceRequest) (*AddServiceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddService not implemented")
-}
-func (UnimplementedSimActiveServer) DeleteService(context.Context, *DeleteServiceRequest) (*DeleteServiceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
-}
-func (UnimplementedSimActiveServer) GetAllServices(context.Context, *Empty) (*GASResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllServices not implemented")
-}
-func (UnimplementedSimActiveServer) UseSimForService(context.Context, *USFSRequest) (*USFSResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UseSimForService not implemented")
-}
-func (UnimplementedSimActiveServer) GetProviderList(context.Context, *Empty) (*ProviderList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProviderList not implemented")
-}
-func (UnimplementedSimActiveServer) mustEmbedUnimplementedSimActiveServer() {}
+func (UnimplementedSimServer) mustEmbedUnimplementedSimServer() {}
 
-// UnsafeSimActiveServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SimActiveServer will
+// UnsafeSimServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SimServer will
 // result in compilation errors.
-type UnsafeSimActiveServer interface {
-	mustEmbedUnimplementedSimActiveServer()
+type UnsafeSimServer interface {
+	mustEmbedUnimplementedSimServer()
 }
 
-func RegisterSimActiveServer(s grpc.ServiceRegistrar, srv SimActiveServer) {
-	s.RegisterService(&SimActive_ServiceDesc, srv)
+func RegisterSimServer(s grpc.ServiceRegistrar, srv SimServer) {
+	s.RegisterService(&Sim_ServiceDesc, srv)
 }
 
-func _SimActive_AddSim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_AddSim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddSimRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).AddSim(ctx, in)
+		return srv.(SimServer).AddSim(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/AddSim",
+		FullMethod: "/Sim/AddSim",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).AddSim(ctx, req.(*AddSimRequest))
+		return srv.(SimServer).AddSim(ctx, req.(*AddSimRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_DeleteSim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_DeleteSim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteSimRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).DeleteSim(ctx, in)
+		return srv.(SimServer).DeleteSim(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/DeleteSim",
+		FullMethod: "/Sim/DeleteSim",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).DeleteSim(ctx, req.(*DeleteSimRequest))
+		return srv.(SimServer).DeleteSim(ctx, req.(*DeleteSimRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_ActivateSim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_ActivateSim_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ActivateSimRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).ActivateSim(ctx, in)
+		return srv.(SimServer).ActivateSim(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/ActivateSim",
+		FullMethod: "/Sim/ActivateSim",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).ActivateSim(ctx, req.(*ActivateSimRequest))
+		return srv.(SimServer).ActivateSim(ctx, req.(*ActivateSimRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_SetSimBlocked_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_SetSimBlocked_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SSBRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).SetSimBlocked(ctx, in)
+		return srv.(SimServer).SetSimBlocked(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/SetSimBlocked",
+		FullMethod: "/Sim/SetSimBlocked",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).SetSimBlocked(ctx, req.(*SSBRequest))
+		return srv.(SimServer).SetSimBlocked(ctx, req.(*SSBRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_GetSimList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_GetSimList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).GetSimList(ctx, in)
+		return srv.(SimServer).GetSimList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/GetSimList",
+		FullMethod: "/Sim/GetSimList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).GetSimList(ctx, req.(*Empty))
+		return srv.(SimServer).GetSimList(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_GetFreeServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_GetFreeServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetFreeServRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).GetFreeServices(ctx, in)
+		return srv.(SimServer).GetFreeServices(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/GetFreeServices",
+		FullMethod: "/Sim/GetFreeServices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).GetFreeServices(ctx, req.(*GetFreeServRequest))
+		return srv.(SimServer).GetFreeServices(ctx, req.(*GetFreeServRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_GetUsedServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Sim_GetUsedServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUsedServRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).GetUsedServices(ctx, in)
+		return srv.(SimServer).GetUsedServices(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/GetUsedServices",
+		FullMethod: "/Sim/GetUsedServices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).GetUsedServices(ctx, req.(*GetUsedServRequest))
+		return srv.(SimServer).GetUsedServices(ctx, req.(*GetUsedServRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_AddService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+// Sim_ServiceDesc is the grpc.ServiceDesc for Sim service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Sim_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Sim",
+	HandlerType: (*SimServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddSim",
+			Handler:    _Sim_AddSim_Handler,
+		},
+		{
+			MethodName: "DeleteSim",
+			Handler:    _Sim_DeleteSim_Handler,
+		},
+		{
+			MethodName: "ActivateSim",
+			Handler:    _Sim_ActivateSim_Handler,
+		},
+		{
+			MethodName: "SetSimBlocked",
+			Handler:    _Sim_SetSimBlocked_Handler,
+		},
+		{
+			MethodName: "GetSimList",
+			Handler:    _Sim_GetSimList_Handler,
+		},
+		{
+			MethodName: "GetFreeServices",
+			Handler:    _Sim_GetFreeServices_Handler,
+		},
+		{
+			MethodName: "GetUsedServices",
+			Handler:    _Sim_GetUsedServices_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "sim.proto",
+}
+
+// ServiceClient is the client API for Service service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ServiceClient interface {
+	AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*AddServiceResponse, error)
+	DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*DeleteServiceResponse, error)
+	GetAllServices(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GASResponse, error)
+}
+
+type serviceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewServiceClient(cc grpc.ClientConnInterface) ServiceClient {
+	return &serviceClient{cc}
+}
+
+func (c *serviceClient) AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*AddServiceResponse, error) {
+	out := new(AddServiceResponse)
+	err := c.cc.Invoke(ctx, "/Service/AddService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*DeleteServiceResponse, error) {
+	out := new(DeleteServiceResponse)
+	err := c.cc.Invoke(ctx, "/Service/DeleteService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serviceClient) GetAllServices(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GASResponse, error) {
+	out := new(GASResponse)
+	err := c.cc.Invoke(ctx, "/Service/GetAllServices", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ServiceServer is the server API for Service service.
+// All implementations must embed UnimplementedServiceServer
+// for forward compatibility
+type ServiceServer interface {
+	AddService(context.Context, *AddServiceRequest) (*AddServiceResponse, error)
+	DeleteService(context.Context, *DeleteServiceRequest) (*DeleteServiceResponse, error)
+	GetAllServices(context.Context, *Empty) (*GASResponse, error)
+	mustEmbedUnimplementedServiceServer()
+}
+
+// UnimplementedServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedServiceServer struct {
+}
+
+func (UnimplementedServiceServer) AddService(context.Context, *AddServiceRequest) (*AddServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddService not implemented")
+}
+func (UnimplementedServiceServer) DeleteService(context.Context, *DeleteServiceRequest) (*DeleteServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
+}
+func (UnimplementedServiceServer) GetAllServices(context.Context, *Empty) (*GASResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllServices not implemented")
+}
+func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
+
+// UnsafeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServiceServer will
+// result in compilation errors.
+type UnsafeServiceServer interface {
+	mustEmbedUnimplementedServiceServer()
+}
+
+func RegisterServiceServer(s grpc.ServiceRegistrar, srv ServiceServer) {
+	s.RegisterService(&Service_ServiceDesc, srv)
+}
+
+func _Service_AddService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddServiceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).AddService(ctx, in)
+		return srv.(ServiceServer).AddService(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/AddService",
+		FullMethod: "/Service/AddService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).AddService(ctx, req.(*AddServiceRequest))
+		return srv.(ServiceServer).AddService(ctx, req.(*AddServiceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_DeleteService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_DeleteService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteServiceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).DeleteService(ctx, in)
+		return srv.(ServiceServer).DeleteService(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/DeleteService",
+		FullMethod: "/Service/DeleteService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).DeleteService(ctx, req.(*DeleteServiceRequest))
+		return srv.(ServiceServer).DeleteService(ctx, req.(*DeleteServiceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_GetAllServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_GetAllServices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).GetAllServices(ctx, in)
+		return srv.(ServiceServer).GetAllServices(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/GetAllServices",
+		FullMethod: "/Service/GetAllServices",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).GetAllServices(ctx, req.(*Empty))
+		return srv.(ServiceServer).GetAllServices(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_UseSimForService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+// Service_ServiceDesc is the grpc.ServiceDesc for Service service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Service_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Service",
+	HandlerType: (*ServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddService",
+			Handler:    _Service_AddService_Handler,
+		},
+		{
+			MethodName: "DeleteService",
+			Handler:    _Service_DeleteService_Handler,
+		},
+		{
+			MethodName: "GetAllServices",
+			Handler:    _Service_GetAllServices_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "sim.proto",
+}
+
+// UsedClient is the client API for Used service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UsedClient interface {
+	UseSimForService(ctx context.Context, in *USFSRequest, opts ...grpc.CallOption) (*USFSResponse, error)
+}
+
+type usedClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUsedClient(cc grpc.ClientConnInterface) UsedClient {
+	return &usedClient{cc}
+}
+
+func (c *usedClient) UseSimForService(ctx context.Context, in *USFSRequest, opts ...grpc.CallOption) (*USFSResponse, error) {
+	out := new(USFSResponse)
+	err := c.cc.Invoke(ctx, "/Used/UseSimForService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UsedServer is the server API for Used service.
+// All implementations must embed UnimplementedUsedServer
+// for forward compatibility
+type UsedServer interface {
+	UseSimForService(context.Context, *USFSRequest) (*USFSResponse, error)
+	mustEmbedUnimplementedUsedServer()
+}
+
+// UnimplementedUsedServer must be embedded to have forward compatible implementations.
+type UnimplementedUsedServer struct {
+}
+
+func (UnimplementedUsedServer) UseSimForService(context.Context, *USFSRequest) (*USFSResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UseSimForService not implemented")
+}
+func (UnimplementedUsedServer) mustEmbedUnimplementedUsedServer() {}
+
+// UnsafeUsedServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UsedServer will
+// result in compilation errors.
+type UnsafeUsedServer interface {
+	mustEmbedUnimplementedUsedServer()
+}
+
+func RegisterUsedServer(s grpc.ServiceRegistrar, srv UsedServer) {
+	s.RegisterService(&Used_ServiceDesc, srv)
+}
+
+func _Used_UseSimForService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(USFSRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).UseSimForService(ctx, in)
+		return srv.(UsedServer).UseSimForService(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/UseSimForService",
+		FullMethod: "/Used/UseSimForService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).UseSimForService(ctx, req.(*USFSRequest))
+		return srv.(UsedServer).UseSimForService(ctx, req.(*USFSRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimActive_GetProviderList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+// Used_ServiceDesc is the grpc.ServiceDesc for Used service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Used_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Used",
+	HandlerType: (*UsedServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "UseSimForService",
+			Handler:    _Used_UseSimForService_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "sim.proto",
+}
+
+// ProviderClient is the client API for Provider service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type ProviderClient interface {
+	GetProviderList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProviderList, error)
+}
+
+type providerClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewProviderClient(cc grpc.ClientConnInterface) ProviderClient {
+	return &providerClient{cc}
+}
+
+func (c *providerClient) GetProviderList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ProviderList, error) {
+	out := new(ProviderList)
+	err := c.cc.Invoke(ctx, "/Provider/GetProviderList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ProviderServer is the server API for Provider service.
+// All implementations must embed UnimplementedProviderServer
+// for forward compatibility
+type ProviderServer interface {
+	GetProviderList(context.Context, *Empty) (*ProviderList, error)
+	mustEmbedUnimplementedProviderServer()
+}
+
+// UnimplementedProviderServer must be embedded to have forward compatible implementations.
+type UnimplementedProviderServer struct {
+}
+
+func (UnimplementedProviderServer) GetProviderList(context.Context, *Empty) (*ProviderList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProviderList not implemented")
+}
+func (UnimplementedProviderServer) mustEmbedUnimplementedProviderServer() {}
+
+// UnsafeProviderServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ProviderServer will
+// result in compilation errors.
+type UnsafeProviderServer interface {
+	mustEmbedUnimplementedProviderServer()
+}
+
+func RegisterProviderServer(s grpc.ServiceRegistrar, srv ProviderServer) {
+	s.RegisterService(&Provider_ServiceDesc, srv)
+}
+
+func _Provider_GetProviderList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimActiveServer).GetProviderList(ctx, in)
+		return srv.(ProviderServer).GetProviderList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/SimActive/GetProviderList",
+		FullMethod: "/Provider/GetProviderList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimActiveServer).GetProviderList(ctx, req.(*Empty))
+		return srv.(ProviderServer).GetProviderList(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// SimActive_ServiceDesc is the grpc.ServiceDesc for SimActive service.
+// Provider_ServiceDesc is the grpc.ServiceDesc for Provider service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var SimActive_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "SimActive",
-	HandlerType: (*SimActiveServer)(nil),
+var Provider_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Provider",
+	HandlerType: (*ProviderServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddSim",
-			Handler:    _SimActive_AddSim_Handler,
-		},
-		{
-			MethodName: "DeleteSim",
-			Handler:    _SimActive_DeleteSim_Handler,
-		},
-		{
-			MethodName: "ActivateSim",
-			Handler:    _SimActive_ActivateSim_Handler,
-		},
-		{
-			MethodName: "SetSimBlocked",
-			Handler:    _SimActive_SetSimBlocked_Handler,
-		},
-		{
-			MethodName: "GetSimList",
-			Handler:    _SimActive_GetSimList_Handler,
-		},
-		{
-			MethodName: "GetFreeServices",
-			Handler:    _SimActive_GetFreeServices_Handler,
-		},
-		{
-			MethodName: "GetUsedServices",
-			Handler:    _SimActive_GetUsedServices_Handler,
-		},
-		{
-			MethodName: "AddService",
-			Handler:    _SimActive_AddService_Handler,
-		},
-		{
-			MethodName: "DeleteService",
-			Handler:    _SimActive_DeleteService_Handler,
-		},
-		{
-			MethodName: "GetAllServices",
-			Handler:    _SimActive_GetAllServices_Handler,
-		},
-		{
-			MethodName: "UseSimForService",
-			Handler:    _SimActive_UseSimForService_Handler,
-		},
-		{
 			MethodName: "GetProviderList",
-			Handler:    _SimActive_GetProviderList_Handler,
+			Handler:    _Provider_GetProviderList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
