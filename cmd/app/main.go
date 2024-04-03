@@ -35,9 +35,8 @@ func main() {
 
 func InitServices(db *sql.DB, logger *slog.Logger) *services.SimService {
 	simService := services.NewSimService(
-		repository.NewInMemoryRepository(),
-		repository.NewSQLRepository(db, logger),
+		repository.NewSimInMemoryRepository(),
+		repository.NewSimSQLRepository(db, logger),
 	)
-
 	return simService
 }
