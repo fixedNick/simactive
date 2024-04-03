@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"log/slog"
 	"simactive/internal/core"
@@ -12,7 +13,7 @@ type SimSqlRepository struct {
 }
 
 // Creates a new SQL Repository object
-func NewSQLRepository(db *sql.DB, logger *slog.Logger) *SimSqlRepository {
+func NewSimSQLRepository(db *sql.DB, logger *slog.Logger) *SimSqlRepository {
 	return &SimSqlRepository{
 		db:     db,
 		logger: logger,
@@ -24,7 +25,7 @@ func NewSQLRepository(db *sql.DB, logger *slog.Logger) *SimSqlRepository {
 // Return error:
 // 1. Sim already exist
 // 2. Internal error: Executing sql or fetching last insert id
-func (sqlRepo *SimSqlRepository) Save(s core.Sim) (id int, err error) {
+func (sqlRepo *SimSqlRepository) Save(ctx context.Context, s core.Sim) (id int, err error) {
 	const op = "sqlRepo.Save()"
 
 	query := "INSERT INTO sim VALUES (?, ?, ?, ?, ?, ?)"
@@ -43,7 +44,7 @@ func (sqlRepo *SimSqlRepository) Save(s core.Sim) (id int, err error) {
 
 // Removes [s core.Sim] from database using [s.id]
 // Return only internal (sql) errors
-func (sqlRepo *SimSqlRepository) Remove(s core.Sim) error {
+func (sqlRepo *SimSqlRepository) Remove(ctx context.Context, s core.Sim) error {
 	const op = "sqlRepo.Remove()"
 
 	query := "DELETE FROM sim WHERE id = ?"
@@ -62,7 +63,7 @@ func (sqlRepo *SimSqlRepository) Remove(s core.Sim) error {
 
 // Receiving list [core.SimList] from db
 // Return only internal (sql) errors
-func (sqlRepo *SimSqlRepository) SimList() (*core.SimList, error) {
+func (sqlRepo *SimSqlRepository) GetSimList(ctx context.Context) (*core.SimList, error) {
 	const op = "sqlRepo.SimList()"
 
 	query := `SELECT * FROM sim`
@@ -100,7 +101,7 @@ func (sqlRepo *SimSqlRepository) SimList() (*core.SimList, error) {
 // Gets [s Sim] from db by its own [id]
 // Return error sql.ErrNoRows
 // Return internal (sql) errors
-func (sqlRepo *SimSqlRepository) ByID(id int) (core.Sim, error) {
+func (sqlRepo *SimSqlRepository) ByID(ctx context.Context, id int) (core.Sim, error) {
 	const op = "sqlRepo.ById()"
 
 	query := "SELECT number, provider_id, is_activated, activate_until, is_blocked FROM sim WHERE id = ?"
@@ -130,7 +131,7 @@ func (sqlRepo *SimSqlRepository) ByID(id int) (core.Sim, error) {
 // Gets [s Sim] from db by its own [number]
 // Return error sql.ErrNoRows
 // Return internal (sql) errors
-func (sqlRepo *SimSqlRepository) ByNumber(number string) (core.Sim, error) {
+func (sqlRepo *SimSqlRepository) ByNumber(ctx context.Context, number string) (core.Sim, error) {
 	const op = "sqlRepo.ByNumber()"
 
 	query := "SELECT id, provider_id, is_activated, activate_until, is_blocked FROM sim WHERE number = ?"
