@@ -9,14 +9,14 @@ service Sim {
     rpc SetSimBlocked (SSBRequest) returns (SSBResponse) {}
     rpc GetSimList (Empty) returns (SimList) {}
 
-    rpc GetFreeServices (GetFreeServRequest) returns (GetFreeServResponse) {}
-    rpc GetUsedServices (GetUsedServRequest) returns (GetUsedServResponse) {}
+    rpc GetFreeServices (GetFreeServRequest) returns (GetFreeServResponse) {} // impl
+    rpc GetUsedServices (GetUsedServRequest) returns (GetUsedServResponse) {} // impl
 }
 
 service Service {
     rpc AddService (AddServiceRequest) returns (AddServiceResponse) {}
     rpc DeleteService (DeleteServiceRequest) returns (DeleteServiceResponse) {}
-    rpc GetAllServices (Empty) returns (GASResponse) {}
+    rpc GetSetviceList (Empty) returns (GSLResponse) {}
 }
 
 service Used {
@@ -82,7 +82,7 @@ message ServiceData {
     int32 Id = 1;
     string Name = 2;
 }
-message GASResponse {
+message GSLResponse {
     repeated ServiceData Services = 1;
 }
 message AddServiceRequest {
@@ -93,7 +93,7 @@ message AddServiceResponse {
 
 }
 message DeleteServiceRequest {
-    string Name = 1;
+    int32 ID = 1;
 }
 message DeleteServiceResponse {
     bool IsDeleted = 1;
