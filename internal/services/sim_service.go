@@ -11,6 +11,8 @@ type SimRepository interface {
 	Save(ctx context.Context, sim core.Sim) (id int, err error)
 	GetSimList(ctx context.Context) (list *core.SimList, err error)
 	Remove(ctx context.Context, id int) (err error)
+	ByID(ctx context.Context, id int) (core.Sim, error)
+	Update(ctx context.Context, s *core.Sim) (err error)
 }
 
 type SimService struct {
@@ -75,4 +77,65 @@ func (ss *SimService) Remove(ctx context.Context, id int) error {
 
 func (ss *SimService) GetSimList(ctx context.Context) (*core.SimList, error) {
 	return ss.inMemoryRepo.GetSimList(ctx)
+}
+
+func (ss *SimService) ActivateSim(ctx context.Context, id int) error {
+	// get sim from list
+	// in-mem -> sql
+
+	receivedSim, err := ss.getByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	receivedSim.SetActivated(true)
+
+	// try to update repositories
+	if imUpdErr := ss.inMemoryRepo.Update(ctx, receivedSim); imUpdErr != nil {
+		return fmt.Errorf("(in-memory repo) cannot update data about sim with id `%d`[%v]. Error: %v", id, receivedSim, imUpdErr)
+	}
+	if sqlUpdErr := ss.sqlRepo.Update(ctx, receivedSim); sqlUpdErr != nil {
+		return fmt.Errorf("(sqlrepo) cannot update data about sim with id `%d`[%v]. Error: %v", id, receivedSim, sqlUpdErr)
+	}
+	return nil
+}
+func (ss *SimService) BlockSim(ctx context.Context, id int) error {
+
+	receivedSim, err := ss.getByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	receivedSim.SetBlocked(true)
+
+	if imUpdErr := ss.inMemoryRepo.Update(ctx, receivedSim); imUpdErr != nil {
+		return fmt.Errorf("(in-memory repo) cannot update data about sim with id `%d`[%v]. Error: %v", id, receivedSim, imUpdErr)
+	}
+	if sqlUpdErr := ss.sqlRepo.Update(ctx, receivedSim); sqlUpdErr != nil {
+		return fmt.Errorf("(sqlrepo) cannot update data about sim with id `%d`[%v]. Error: %v", id, receivedSim, sqlUpdErr)
+	}
+	return nil
+}
+
+func (ss *SimService) getByID(ctx context.Context, id int) (*core.Sim, error) {
+	var receivedSim core.Sim
+
+	receivedSim, imErr := ss.inMemoryRepo.ByID(ctx, id)
+	if imErr != nil {
+		// try to get from sql
+		sim, sErr := ss.sqlRepo.ByID(ctx, id)
+		if sErr != nil {
+			return nil, fmt.Errorf("cannot get sim with id `%d` from in-memory err: [%v] and from sql err: [%v]", id, imErr, sErr)
+		}
+
+		// setup outer var
+		receivedSim = sim
+		// try to save into local repository
+		_, err := ss.inMemoryRepo.Save(ctx, sim)
+		if err != nil {
+			return nil, fmt.Errorf("received sim with id `%d` from sql but got erros with in-memory.\nById error: [%v]\nSave into memory error: [%v]", id, imErr, err)
+		}
+	}
+
+	return &receivedSim, nil
 }

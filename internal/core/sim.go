@@ -8,15 +8,7 @@ type Sim struct {
 	isBlocked     bool
 	activateUntil int64
 }
-type SimList map[int]Sim
 
-func NewSimList(s ...Sim) SimList {
-	list := make(SimList)
-	for _, sim := range s {
-		list[sim.Id()] = sim
-	}
-	return list
-}
 func NewSim(id int, number string, providerId int, isActivated bool, activateUntil int64, isBlocked bool) Sim {
 	return Sim{
 		id:            id,
@@ -45,6 +37,22 @@ func (s Sim) IsActivated() bool {
 func (s Sim) ActivateUntil() int64 {
 	return s.activateUntil
 }
+
 func (s *Sim) SetID(id int) {
 	s.id = id
+}
+func (s *Sim) SetActivated(status bool) {
+	s.isActivated = status
+}
+func (s *Sim) SetNumber(number string) {
+	s.number = number
+}
+func (s *Sim) SetBlocked(status bool) {
+	s.isBlocked = status
+}
+func (s *Sim) SetActivateUntil(aunt int64) {
+	s.activateUntil = aunt
+}
+func (s *Sim) SetProviderID(pid int) {
+	s.providerId = pid
 }

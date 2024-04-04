@@ -123,5 +123,17 @@ func (sqlRepo *SimSqlRepository) ByID(ctx context.Context, id int) (core.Sim, er
 		panic("implement internal")
 	}
 
-	return core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked), nil
+	sim := core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked)
+	return sim, nil
+}
+
+// TODO
+// Use DTO or Options pattern(guess nah) to update only needed columns of row
+func (sqlRepo *SimSqlRepository) Update(ctx context.Context, s *core.Sim) error {
+	query := "UPDATE sim SET number = ?, provider_id = ?, is_activated = ?, activate_until = ?, is_blocked = ? WHERE id = ?"
+	_, err := sqlRepo.db.Exec(query, s.Number(), s.ProviderID(), s.IsActivated(), s.ActivateUntil(), s.IsBlocked(), s.Id())
+	if err != nil {
+		return fmt.Errorf("error ocured on updating sim with id `%d`, err: [%v]", s.Id(), err)
+	}
+	return nil
 }
