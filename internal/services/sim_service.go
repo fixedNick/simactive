@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"simactive/internal/core"
 )
@@ -58,5 +59,16 @@ func (ss *SimService) GetByID(ctx context.Context, id int) (sim core.Sim, err er
 	panic("")
 }
 func (ss *SimService) Remove(ctx context.Context, id int) error {
-	panic("")
+
+	// firstly remove it from local storage
+	// then remove from sql
+
+	if err := ss.inMemoryRepo.Remove(ctx, id); err != nil {
+		return fmt.Errorf("error ocured on in-memory repository: %v", err)
+	}
+	if err := ss.sqlRepo.Remove(ctx, id); err != nil {
+		return fmt.Errorf("error ocured on sql repository: %v", err)
+	}
+
+	return nil
 }

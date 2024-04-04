@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"simactive/internal/core"
 )
@@ -26,7 +27,6 @@ func NewSimSQLRepository(db *sql.DB, logger *slog.Logger) *SimSqlRepository {
 // 1. Sim already exist
 // 2. Internal error: Executing sql or fetching last insert id
 func (sqlRepo *SimSqlRepository) Save(ctx context.Context, s core.Sim) (id int, err error) {
-	const op = "sqlRepo.Save()"
 
 	query := "INSERT INTO sim VALUES (?, ?, ?, ?, ?, ?)"
 	r, err := sqlRepo.db.Exec(query, 0, s.Number(), s.ProviderID(), s.IsActivated(), s.ActivateUntil(), s.IsBlocked())
@@ -45,18 +45,18 @@ func (sqlRepo *SimSqlRepository) Save(ctx context.Context, s core.Sim) (id int, 
 // Removes [s core.Sim] from database using [s.id]
 // Return only internal (sql) errors
 func (sqlRepo *SimSqlRepository) Remove(ctx context.Context, id int) error {
-	const op = "sqlRepo.Remove()"
 
 	query := "DELETE FROM sim WHERE id = ?"
 	r, err := sqlRepo.db.Exec(query, id)
 	if err != nil {
-		panic("implement")
+		return fmt.Errorf("internal error in query execution")
 	}
 
 	affected, err := r.RowsAffected()
 	if err != nil {
 		// заглушка на affected
-		panic("implement" + string(affected))
+		fmt.Printf("%d", affected)
+		return fmt.Errorf("internal error on `RowsAffected method`")
 	}
 	return nil
 }
@@ -64,7 +64,6 @@ func (sqlRepo *SimSqlRepository) Remove(ctx context.Context, id int) error {
 // Receiving list [core.SimList] from db
 // Return only internal (sql) errors
 func (sqlRepo *SimSqlRepository) GetSimList(ctx context.Context) (*core.SimList, error) {
-	const op = "sqlRepo.SimList()"
 
 	query := `SELECT * FROM sim`
 	rows, err := sqlRepo.db.Query(query)
@@ -102,7 +101,6 @@ func (sqlRepo *SimSqlRepository) GetSimList(ctx context.Context) (*core.SimList,
 // Return error sql.ErrNoRows
 // Return internal (sql) errors
 func (sqlRepo *SimSqlRepository) ByID(ctx context.Context, id int) (core.Sim, error) {
-	const op = "sqlRepo.ById()"
 
 	query := "SELECT number, provider_id, is_activated, activate_until, is_blocked FROM sim WHERE id = ?"
 	row := sqlRepo.db.QueryRow(query, id)
