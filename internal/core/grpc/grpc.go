@@ -14,6 +14,9 @@ import (
 type GRPCServer struct {
 	port    int
 	timeout time.Duration
+
+	// gRPC services
+	server *grpc.Server
 }
 
 func NewGRPCServer(cfg *config.Config) *GRPCServer {
@@ -28,11 +31,17 @@ func (gs *GRPCServer) MustRun(simService SimService) {
 	if err != nil {
 		log.Fatalf("error starting gRPC server: %v", err)
 	}
+
 	s := grpc.NewServer()
+	gs.server = s
 	pb.RegisterSimServer(s, NewGRPCSimService(simService, gs.timeout))
 
 	log.Print("Starting gRPC server...")
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("error serving gRPC requests: %v", err)
 	}
+}
+
+func (gs *GRPCServer) Stop() {
+	gs.server.GracefulStop()
 }
