@@ -94,7 +94,7 @@ func (gs GRPCSimService) SetSimBlocked(ctx context.Context, req *pb.SSBRequest) 
 	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
 	defer cancel()
 
-	if err := gs.simService.ActivateSim(ctx, int(req.Id)); err != nil {
+	if err := gs.simService.BlockSim(ctx, int(req.Id)); err != nil {
 		return nil, ErrInternal
 	}
 
