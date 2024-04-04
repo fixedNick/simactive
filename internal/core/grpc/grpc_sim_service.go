@@ -12,6 +12,7 @@ type SimService interface {
 	Add(ctx context.Context, s core.Sim) (err error)
 	GetByID(ctx context.Context, id int) (sim core.Sim, err error)
 	Remove(ctx context.Context, id int) (err error)
+	GetSimList(ctx context.Context) (*core.SimList, error)
 }
 
 type GRPCSimService struct {
@@ -52,4 +53,29 @@ func (gs GRPCSimService) DeleteSim(ctx context.Context, req *pb.DeleteSimRequest
 	return &pb.DeleteSimResponse{
 		IsDeleted: true,
 	}, nil
+}
+
+func (gs GRPCSimService) GetSimList(ctx context.Context, req *pb.Empty) (*pb.SimList, error) {
+	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
+	defer cancel()
+
+	list, err := gs.simService.GetSimList(ctx)
+	if err != nil {
+		return nil, ErrInternal
+	}
+
+	var response pb.SimList
+	response.SimList = make([]*pb.SimData, 0, len(*list))
+	for _, sim := range *list {
+		response.SimList = append(response.SimList, &pb.SimData{
+			ID:            int32(sim.Id()),
+			Number:        sim.Number(),
+			ProviderID:    int32(sim.ProviderID()),
+			IsActivated:   sim.IsActivated(),
+			IsBlocked:     sim.IsBlocked(),
+			ActivateUntil: sim.ActivateUntil(),
+		})
+	}
+
+	return &response, nil
 }

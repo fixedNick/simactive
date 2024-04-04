@@ -72,3 +72,7 @@ func (ss *SimService) Remove(ctx context.Context, id int) error {
 
 	return nil
 }
+
+func (ss *SimService) GetSimList(ctx context.Context) (*core.SimList, error) {
+	return ss.inMemoryRepo.GetSimList(ctx)
+}
