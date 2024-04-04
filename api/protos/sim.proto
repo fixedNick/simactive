@@ -57,11 +57,12 @@ message SimList {
     repeated SimData SimList = 1;
 }
 message SimData {
-    string Number = 1;
-    int32 ProviderID = 2;
-    bool IsActivated = 3;
-    int64 ActivateUntil = 4;
-    bool IsBlocked = 5;
+    int32 ID = 1;
+    string Number = 2;
+    int32 ProviderID = 3;
+    bool IsActivated = 4;
+    int64 ActivateUntil = 5;
+    bool IsBlocked = 6;
 }
 message USFSRequest {
     string Number = 1;
