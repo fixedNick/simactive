@@ -9,6 +9,13 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+// errors
+var (
+	ErrInternal = status.Error(codes.Internal, "Internal Server Error")
 )
 
 type GRPCServer struct {

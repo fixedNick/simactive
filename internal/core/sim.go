@@ -8,12 +8,12 @@ type Sim struct {
 	isBlocked     bool
 	activateUntil int64
 }
-type SimList map[string]Sim
+type SimList map[int]Sim
 
 func NewSimList(s ...Sim) SimList {
 	list := make(SimList)
 	for _, sim := range s {
-		list[sim.Number()] = sim
+		list[sim.Id()] = sim
 	}
 	return list
 }

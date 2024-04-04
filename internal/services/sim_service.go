@@ -9,6 +9,7 @@ import (
 type SimRepository interface {
 	Save(ctx context.Context, sim core.Sim) (id int, err error)
 	GetSimList(ctx context.Context) (list *core.SimList, err error)
+	Remove(ctx context.Context, id int) (err error)
 }
 
 type SimService struct {
@@ -56,6 +57,6 @@ func (ss *SimService) Add(ctx context.Context, s core.Sim) error {
 func (ss *SimService) GetByID(ctx context.Context, id int) (sim core.Sim, err error) {
 	panic("")
 }
-func (ss *SimService) Remove(ctx context.Context, s core.Sim) error {
+func (ss *SimService) Remove(ctx context.Context, id int) error {
 	panic("")
 }

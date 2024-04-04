@@ -6,15 +6,12 @@ import (
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
 	"simactive/internal/core"
 	"time"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type SimService interface {
-	Add(ctx context.Context, s core.Sim) error
+	Add(ctx context.Context, s core.Sim) (err error)
 	GetByID(ctx context.Context, id int) (sim core.Sim, err error)
-	Remove(ctx context.Context, s core.Sim) error
+	Remove(ctx context.Context, id int) (err error)
 }
 
 type GRPCSimService struct {
@@ -38,7 +35,7 @@ func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb
 
 	sim := core.NewSim(0, req.SimData.Number, int(req.SimData.ProviderID), req.SimData.IsActivated, req.SimData.ActivateUntil, req.SimData.IsBlocked)
 	if err := gs.simService.Add(ctx, sim); err != nil {
-		return nil, status.Error(codes.Internal, "Internal Server Error")
+		return nil, ErrInternal
 	}
 	return &pb.AddSimResponse{
 		IsAdded: true,
@@ -47,6 +44,12 @@ func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb
 }
 
 func (gs GRPCSimService) DeleteSim(ctx context.Context, req *pb.DeleteSimRequest) (*pb.DeleteSimResponse, error) {
-	panic("")
-
+	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
+	defer cancel()
+	if err := gs.simService.Remove(ctx, int(req.GetId())); err != nil {
+		return nil, ErrInternal
+	}
+	return &pb.DeleteSimResponse{
+		IsDeleted: true,
+	}, nil
 }

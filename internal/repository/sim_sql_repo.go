@@ -44,11 +44,11 @@ func (sqlRepo *SimSqlRepository) Save(ctx context.Context, s core.Sim) (id int, 
 
 // Removes [s core.Sim] from database using [s.id]
 // Return only internal (sql) errors
-func (sqlRepo *SimSqlRepository) Remove(ctx context.Context, s core.Sim) error {
+func (sqlRepo *SimSqlRepository) Remove(ctx context.Context, id int) error {
 	const op = "sqlRepo.Remove()"
 
 	query := "DELETE FROM sim WHERE id = ?"
-	r, err := sqlRepo.db.Exec(query, s.Id())
+	r, err := sqlRepo.db.Exec(query, id)
 	if err != nil {
 		panic("implement")
 	}
@@ -92,7 +92,7 @@ func (sqlRepo *SimSqlRepository) GetSimList(ctx context.Context) (*core.SimList,
 			panic("implement")
 		}
 
-		coreList[number] = core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked)
+		coreList[id] = core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked)
 	}
 
 	return &coreList, nil
@@ -115,35 +115,6 @@ func (sqlRepo *SimSqlRepository) ByID(ctx context.Context, id int) (core.Sim, er
 	)
 
 	err := row.Scan(&number, &providerId, &isActivated, &activateUntil, &isBlocked)
-
-	switch err {
-	case nil:
-		break
-	case sql.ErrNoRows:
-		panic("implement no rows")
-	default:
-		panic("implement internal")
-	}
-
-	return core.NewSim(id, number, providerId, isActivated, activateUntil, isBlocked), nil
-}
-
-// Gets [s Sim] from db by its own [number]
-// Return error sql.ErrNoRows
-// Return internal (sql) errors
-func (sqlRepo *SimSqlRepository) ByNumber(ctx context.Context, number string) (core.Sim, error) {
-	const op = "sqlRepo.ByNumber()"
-
-	query := "SELECT id, provider_id, is_activated, activate_until, is_blocked FROM sim WHERE number = ?"
-	row := sqlRepo.db.QueryRow(query, number)
-
-	var (
-		providerId, id         int
-		isActivated, isBlocked bool
-		activateUntil          int64
-	)
-
-	err := row.Scan(&id, &providerId, &isActivated, &activateUntil, &isBlocked)
 
 	switch err {
 	case nil:

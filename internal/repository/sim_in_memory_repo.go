@@ -21,11 +21,11 @@ func NewSimInMemoryRepository(s ...core.Sim) *SimInMemoryRepo {
 // Saving [s Sim] into in-memory repository
 // Returns [error] if core with same number already in repo
 func (coreRepo SimInMemoryRepo) Save(ctx context.Context, s core.Sim) (int, error) {
-	if _, ok := coreRepo.list[s.Number()]; ok {
+	if _, ok := coreRepo.list[s.Id()]; ok {
 		return 0, fmt.Errorf("sim with number %s already exists", s.Number())
 	}
 
-	coreRepo.list[s.Number()] = s
+	coreRepo.list[s.Id()] = s
 
 	log.Printf("Sim with number %s saved into in-memory data with id %d", s.Number(), s.Id())
 	return s.Id(), nil
@@ -33,19 +33,19 @@ func (coreRepo SimInMemoryRepo) Save(ctx context.Context, s core.Sim) (int, erro
 
 // Removing [s Sim] from in-memory repository
 // Returns [error] if core does not exist in repo
-func (coreRepo SimInMemoryRepo) Remove(ctx context.Context, s core.Sim) error {
-	if _, ok := coreRepo.list[s.Number()]; ok {
-		delete(coreRepo.list, s.Number())
+func (coreRepo SimInMemoryRepo) Remove(ctx context.Context, id int) error {
+	if _, ok := coreRepo.list[id]; ok {
+		delete(coreRepo.list, id)
 		return nil
 	}
-	return fmt.Errorf("core with number %s does not exist on in-memory repo", s.Number())
+	return fmt.Errorf("sim with id [%d]does not exist on in-memory repo", id)
 }
 
 // Returns [core.SimList - map[string]Sim] where key is core.Number()
 // Returns [error] if list is not initialized
 func (coreRepo SimInMemoryRepo) GetSimList(ctx context.Context) (*core.SimList, error) {
 	if coreRepo.list == nil {
-		return nil, fmt.Errorf("core list is not initialized")
+		return nil, fmt.Errorf("sim list is not initialized")
 	}
 	return &coreRepo.list, nil
 }
@@ -66,21 +66,5 @@ func (coreRepo SimInMemoryRepo) ById(ctx context.Context, id int) (core.Sim, err
 		}
 	}
 
-	return core.Sim{}, fmt.Errorf("core with id %d not found", id)
-}
-
-// calls SimList of current repo
-// returns [s Sim] found by id
-// returns [error] if core not found
-// returns [error] if List is not initialized
-func (coreRepo SimInMemoryRepo) ByNumber(ctx context.Context, number string) (core.Sim, error) {
-	list, err := coreRepo.GetSimList(ctx)
-	if err != nil {
-		return core.Sim{}, err
-	}
-
-	if s, ok := (*list)[number]; ok {
-		return s, nil
-	}
-	return core.Sim{}, fmt.Errorf("core with number %s not found at in-memory repo", number)
+	return core.Sim{}, fmt.Errorf("sim with id %d not found", id)
 }

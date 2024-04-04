@@ -111,7 +111,7 @@ message AddSimResponse {
     bool IsAdded = 2;           // True when operation finished as success
 }
 message DeleteSimRequest {
-    string Number = 1;          // phone number to delete
+    int32 id = 1;          // phone number to delete
 }
 
 message DeleteSimResponse {
