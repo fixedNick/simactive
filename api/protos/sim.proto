@@ -8,6 +8,7 @@ service Sim {
     rpc ActivateSim (ActivateSimRequest) returns (ActivateSimResponse) {}
     rpc SetSimBlocked (SSBRequest) returns (SSBResponse) {}
     rpc GetSimList (Empty) returns (SimList) {}
+
     rpc GetFreeServices (GetFreeServRequest) returns (GetFreeServResponse) {}
     rpc GetUsedServices (GetUsedServRequest) returns (GetUsedServResponse) {}
 }
@@ -29,7 +30,7 @@ service Provider {
 message Empty {}
 
 message SSBRequest {
-    string number = 1;
+    int32 id = 1;
 }
 message SSBResponse {
     bool isBlocked = 1;
@@ -72,7 +73,7 @@ message USFSResponse {
     bool IsUsed = 1;
 }
 message ActivateSimRequest {
-    string Number = 1;
+    int32 id = 1;
 }
 message ActivateSimResponse {
     bool IsActivated = 1;
