@@ -9,9 +9,9 @@ import (
 )
 
 type SimService interface {
-	Add(ctx context.Context, s core.Sim) error
+	Add(ctx context.Context, s core.Sim) (int, error)
 	Remove(ctx context.Context, id int) error
-	GetSimList(ctx context.Context) (*core.SimList, error)
+	GetSimList(ctx context.Context) (*core.List[core.Sim], error)
 	ActivateSim(ctx context.Context, id int) error
 	BlockSim(ctx context.Context, id int) error
 }
@@ -35,12 +35,13 @@ func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb
 	defer cancel()
 
 	sim := core.NewSim(0, req.SimData.Number, int(req.SimData.ProviderID), req.SimData.IsActivated, req.SimData.ActivateUntil, req.SimData.IsBlocked)
-	if err := gs.simService.Add(ctx, sim); err != nil {
+	id, err := gs.simService.Add(ctx, sim)
+	if err != nil {
 		return nil, ErrInternal
 	}
 	return &pb.AddSimResponse{
 		IsAdded: true,
-		Message: fmt.Sprintf("sim card with number %s added", sim.Number()),
+		Message: fmt.Sprintf("sim card with number %s added. Sim id is `%d`", sim.Number(), id),
 	}, nil
 }
 func (gs GRPCSimService) DeleteSim(ctx context.Context, req *pb.DeleteSimRequest) (*pb.DeleteSimResponse, error) {

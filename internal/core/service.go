@@ -1,5 +1,7 @@
 package core
 
+import "database/sql"
+
 type Service struct {
 	id   int
 	name string
@@ -26,4 +28,15 @@ func (s *Service) SetID(id int) {
 
 func (s *Service) SetName(name string) {
 	s.name = name
+}
+
+// [Scan] return object of [Service] whitch is [Scannable], and map index [int]
+// If any errors ocured while scanning it will be in [error]
+func (s Service) Scan(rows *sql.Rows) (Scannable, int, error) {
+	scannedService := Service{}
+	err := rows.Scan(&scannedService.id, &scannedService.name)
+	if err != nil {
+		return scannedService, 0, err
+	}
+	return scannedService, scannedService.id, err
 }
