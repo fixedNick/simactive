@@ -9,9 +9,9 @@ import (
 )
 
 type SimService interface {
-	Add(ctx context.Context, s core.Sim) (int, error)
+	Add(ctx context.Context, s *core.Sim) (int, error)
 	Remove(ctx context.Context, id int) error
-	GetSimList(ctx context.Context) (*core.List[core.Sim], error)
+	GetSimList(ctx context.Context) (*core.List[*core.Sim], error)
 	ActivateSim(ctx context.Context, id int) error
 	BlockSim(ctx context.Context, id int) error
 }
@@ -35,9 +35,9 @@ func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb
 	defer cancel()
 
 	sim := core.NewSim(0, req.SimData.Number, int(req.SimData.ProviderID), req.SimData.IsActivated, req.SimData.ActivateUntil, req.SimData.IsBlocked)
-	id, err := gs.simService.Add(ctx, sim)
+	id, err := gs.simService.Add(ctx, &sim)
 	if err != nil {
-		return nil, ErrInternal
+		return nil, err
 	}
 	return &pb.AddSimResponse{
 		IsAdded: true,

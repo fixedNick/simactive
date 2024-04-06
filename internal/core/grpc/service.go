@@ -10,7 +10,7 @@ import (
 type ServiceService interface {
 	Add(ctx context.Context, s core.Service) error
 	Remove(ctx context.Context, id int) error
-	GetServiceList(ctx context.Context) (*core.List[core.Service], error)
+	GetServiceList(ctx context.Context) (*core.List[*core.Service], error)
 }
 
 type GRPCServiceService struct {

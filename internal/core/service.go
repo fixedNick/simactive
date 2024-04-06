@@ -30,13 +30,29 @@ func (s *Service) SetName(name string) {
 	s.name = name
 }
 
-// [Scan] return object of [Service] whitch is [Scannable], and map index [int]
+// [ScanRow] return object of [Service] whitch is [Scannable], and map index [int]
 // If any errors ocured while scanning it will be in [error]
-func (s Service) Scan(rows *sql.Rows) (Scannable, int, error) {
-	scannedService := Service{}
+func (s *Service) ScanRow(rows *sql.Row) (Scannable, error) {
+	scannedService := &Service{}
+	err := rows.Scan(&scannedService.id, &scannedService.name)
+	if err != nil {
+		return scannedService, err
+	}
+	return scannedService, err
+}
+func (s *Service) ScanRows(rows *sql.Rows) (Scannable, int, error) {
+	scannedService := &Service{}
 	err := rows.Scan(&scannedService.id, &scannedService.name)
 	if err != nil {
 		return scannedService, 0, err
 	}
 	return scannedService, scannedService.id, err
+}
+
+func (s *Service) GetKey() int {
+	return s.Id()
+}
+
+func (s *Service) SetKey(id int) {
+	s.id = id
 }

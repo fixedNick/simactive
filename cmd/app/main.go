@@ -52,7 +52,7 @@ func main() {
 func InitServices(db *sql.DB, logger *slog.Logger) (*services.SimService, *services.ServiceService) {
 
 	simService := services.NewSimService(
-		repository.NewRepository[core.Sim](
+		repository.NewRepository[*core.Sim](
 			context.Background(),
 			db,
 			logger,
@@ -60,7 +60,7 @@ func InitServices(db *sql.DB, logger *slog.Logger) (*services.SimService, *servi
 	)
 
 	serviceService := services.NewServiceService(
-		repository.NewRepository[core.Service](
+		repository.NewRepository[*core.Service](
 			context.Background(),
 			db,
 			logger,

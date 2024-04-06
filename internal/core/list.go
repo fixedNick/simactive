@@ -5,13 +5,24 @@ import (
 	"fmt"
 )
 
-type Scannable interface {
-	Scan(rows *sql.Rows) (Scannable, int, error)
+type DBModel interface {
+	Scannable
+	Keyable
 }
 
-type List[T Scannable] map[int]T
+type Keyable interface {
+	SetKey(id int)
+	GetKey() int
+}
 
-func NewSimList[T Scannable]() List[T] {
+type Scannable interface {
+	ScanRows(rows *sql.Rows) (Scannable, int, error)
+	ScanRow(rows *sql.Row) (Scannable, error)
+}
+
+type List[T DBModel] map[int]T
+
+func NewSimList[T DBModel]() List[T] {
 	list := make(List[T])
 	return list
 }

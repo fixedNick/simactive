@@ -61,11 +61,28 @@ func (s *Sim) SetProviderID(pid int) {
 
 // [Scan] return object of [Sim] whitch is [Scannable], and map index [int]
 // If any errors ocured while scanning it will be in [error]
-func (s Sim) Scan(rows *sql.Rows) (Scannable, int, error) {
-	scannedSim := Sim{}
-	err := rows.Scan(&scannedSim.id, &scannedSim.number, &scannedSim.providerId, &scannedSim.isActivated, &scannedSim.activateUntil, &scannedSim.isBlocked)
+func (s *Sim) ScanRows(row *sql.Rows) (Scannable, int, error) {
+	scannedSim := &Sim{}
+	err := row.Scan(&scannedSim.id, &scannedSim.number, &scannedSim.providerId, &scannedSim.isActivated, &scannedSim.activateUntil, &scannedSim.isBlocked)
 	if err != nil {
 		return scannedSim, 0, err
 	}
 	return scannedSim, scannedSim.id, err
+}
+
+func (s *Sim) ScanRow(row *sql.Row) (Scannable, error) {
+	scannedSim := &Sim{}
+	err := row.Scan(&scannedSim.id, &scannedSim.number, &scannedSim.providerId, &scannedSim.isActivated, &scannedSim.activateUntil, &scannedSim.isBlocked)
+	if err != nil {
+		return scannedSim, err
+	}
+	return scannedSim, err
+}
+
+func (s *Sim) GetKey() int {
+	return s.Id()
+}
+
+func (s *Sim) SetKey(id int) {
+	s.id = id
 }
