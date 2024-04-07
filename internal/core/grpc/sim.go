@@ -30,7 +30,7 @@ func NewGRPCSimService(ss SimService, timeout time.Duration) GRPCSimService {
 	}
 }
 func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb.AddSimResponse, error) {
-	// validate
+
 	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
 	defer cancel()
 
@@ -61,6 +61,10 @@ func (gs GRPCSimService) GetSimList(ctx context.Context, req *pb.Empty) (*pb.Sim
 	list, err := gs.simService.GetSimList(ctx)
 	if err != nil {
 		return nil, ErrInternal
+	}
+
+	if list == nil {
+		return &pb.SimList{}, nil
 	}
 
 	var response pb.SimList
