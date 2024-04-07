@@ -16,8 +16,8 @@ type Keyable interface {
 }
 
 type Scannable interface {
-	ScanRows(rows *sql.Rows) (Scannable, int, error)
-	ScanRow(rows *sql.Row) (Scannable, error)
+	ScanRows(rows *sql.Rows) (int, error)
+	ScanRow(rows *sql.Row) error
 }
 
 type List[T DBModel] map[int]T

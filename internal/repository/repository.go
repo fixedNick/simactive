@@ -131,11 +131,11 @@ func (r *Repository[T]) GetList(ctx context.Context) (*core.List[T], error) {
 			break
 		}
 
-		v, key, err := v.ScanRows(rows)
+		key, err := v.ScanRows(rows)
 		if err != nil {
 			return nil, err
 		}
-		list[key] = v.(T)
+		list[key] = v
 	}
 	return &list, nil
 }
@@ -165,12 +165,12 @@ func (r *Repository[T]) ByID(ctx context.Context, id int) (T, error) {
 	}
 
 	row := r.Db.QueryRowContext(ctx, query, args...)
-	obj, err := v.ScanRow(row)
+	err := v.ScanRow(row)
 	if err != nil {
 		return v, err
 	}
 
-	return obj.(T), nil
+	return v, nil
 }
 func (r *Repository[T]) Update(ctx context.Context, s T) error {
 	// check is object exist locally
