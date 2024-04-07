@@ -14,17 +14,38 @@ type ProviderService interface {
 type GRPCProviderService struct {
 	pb.UnimplementedProviderServer
 
-	timeout    time.Duration
-	simService ProviderService
+	timeout         time.Duration
+	providerService ProviderService
 }
 
 func NewGRPCProviderService(ss ProviderService, timeout time.Duration) GRPCProviderService {
 	return GRPCProviderService{
-		simService: ss,
-		timeout:    timeout,
+		providerService: ss,
+		timeout:         timeout,
 	}
 }
 
-func GetProviderList(ctx context.Context, req *pb.Empty) (*pb.ProviderList, error) {
-	panic("implement")
+// GetProviderList retrieves a list of providers.
+func (gps GRPCProviderService) GetProviderList(ctx context.Context, _ *pb.Empty) (*pb.ProviderList, error) {
+	ctx, cancel := context.WithTimeout(ctx, gps.timeout)
+	defer cancel()
+
+	providerList, err := gps.providerService.GetProviderList(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// if providerList is nil, return empty list
+	if providerList == nil {
+		return &pb.ProviderList{}, nil
+	}
+
+	providers := make([]*pb.ProviderData, 0, len(*providerList))
+	for _, provider := range *providerList {
+		providers = append(providers, &pb.ProviderData{
+			Id:   int32(provider.Id()),
+			Name: provider.Name(),
+		})
+	}
+	return &pb.ProviderList{Providers: providers}, nil
 }

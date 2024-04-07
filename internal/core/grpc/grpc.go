@@ -33,22 +33,28 @@ func NewGRPCServer(cfg *config.Config) *GRPCServer {
 	}
 }
 
-func (gs *GRPCServer) MustRun(simService SimService, serviceService ServiceService, providerService ProviderService, usedService UsedService) {
-	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", gs.port))
+// MustRun runs the GRPCServer.
+//
+// It takes a SimService, a ServiceService, a ProviderService, and a UsedService as arguments.
+// It truly panics if the gRPC server fails to start.
+func (s *GRPCServer) MustRun(sim SimService, ss ServiceService, ps ProviderService, us UsedService) {
+	addr := fmt.Sprintf("127.0.0.1:%d", s.port)
+	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalf("error starting gRPC server: %v", err)
+		log.Fatalf("failed to start gRPC server: %v", err)
 	}
 
-	s := grpc.NewServer()
-	gs.server = s
-	pb.RegisterSimServer(s, NewGRPCSimService(simService, gs.timeout))
-	pb.RegisterServiceServer(s, NewGRPCServiceService(serviceService, gs.timeout))
-	pb.RegisterProviderServer(s, NewGRPCProviderService(providerService, gs.timeout))
-	pb.RegisterUsedServer(s, NewGRPCUsedService(usedService, gs.timeout))
+	gs := grpc.NewServer()
+	s.server = gs
 
-	log.Print("Starting gRPC server...")
-	if err = s.Serve(lis); err != nil {
-		log.Fatalf("error serving gRPC requests: %v", err)
+	pb.RegisterSimServer(gs, NewGRPCSimService(sim, s.timeout))
+	pb.RegisterServiceServer(gs, NewGRPCServiceService(ss, s.timeout))
+	pb.RegisterProviderServer(gs, NewGRPCProviderService(ps, s.timeout))
+	pb.RegisterUsedServer(gs, NewGRPCUsedService(us, s.timeout))
+
+	log.Println("Starting gRPC server...")
+	if err = gs.Serve(lis); err != nil {
+		log.Fatalf("failed to serve gRPC requests: %v", err)
 	}
 }
 
