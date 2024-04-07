@@ -1,6 +1,8 @@
 package core
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Used struct {
 	id          int
@@ -29,7 +31,18 @@ func (u *Used) BlockedInfo() string {
 	return u.blockedInfo
 }
 
-/// Setters
+// / With
+func (u Used) WithSimID(id int) Used {
+	u.simId = id
+	return u
+}
+
+func (u Used) WithServiceID(id int) Used {
+	u.serviceId = id
+	return u
+}
+
+// / Setters
 func (u *Used) SetId(id int) {
 	u.id = id
 }
