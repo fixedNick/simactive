@@ -33,7 +33,7 @@ func NewGRPCServer(cfg *config.Config) *GRPCServer {
 	}
 }
 
-func (gs *GRPCServer) MustRun(simService SimService, serviceService ServiceService) {
+func (gs *GRPCServer) MustRun(simService SimService, serviceService ServiceService, providerService ProviderService, usedService UsedService) {
 	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", gs.port))
 	if err != nil {
 		log.Fatalf("error starting gRPC server: %v", err)
@@ -43,6 +43,8 @@ func (gs *GRPCServer) MustRun(simService SimService, serviceService ServiceServi
 	gs.server = s
 	pb.RegisterSimServer(s, NewGRPCSimService(simService, gs.timeout))
 	pb.RegisterServiceServer(s, NewGRPCServiceService(serviceService, gs.timeout))
+	pb.RegisterProviderServer(s, NewGRPCProviderService(providerService, gs.timeout))
+	pb.RegisterUsedServer(s, NewGRPCUsedService(usedService, gs.timeout))
 
 	log.Print("Starting gRPC server...")
 	if err = s.Serve(lis); err != nil {

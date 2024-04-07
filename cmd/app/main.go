@@ -28,13 +28,13 @@ func main() {
 	db := coresql.MustInit()
 
 	// Init services
-	simService, serviceService := InitServices(db, logger)
+	simService, serviceService, providerService, usedService := InitServices(db, logger)
 
 	// Init gRPC Server
 	gs := grpc.NewGRPCServer(cfg)
 	// Run gRPC server
 	go func() {
-		gs.MustRun(simService, serviceService)
+		gs.MustRun(simService, serviceService, providerService, usedService)
 	}()
 
 	// gracefull shutdown
@@ -49,7 +49,7 @@ func main() {
 	log.Print("Gracefull shutdown")
 }
 
-func InitServices(db *sql.DB, logger *slog.Logger) (*services.SimService, *services.ServiceService) {
+func InitServices(db *sql.DB, logger *slog.Logger) (*services.SimService, *services.ServiceService, *services.ProviderService, *services.UsedService) {
 
 	simService := services.NewSimService(
 		repository.NewRepository[*core.Sim](
@@ -67,5 +67,21 @@ func InitServices(db *sql.DB, logger *slog.Logger) (*services.SimService, *servi
 		),
 	)
 
-	return simService, serviceService
+	providerService := services.NewProviderService(
+		repository.NewRepository[*core.Provider](
+			context.Background(),
+			db,
+			logger,
+		),
+	)
+
+	usedService := services.NewUsedService(
+		repository.NewRepository[*core.Used](
+			context.Background(),
+			db,
+			logger,
+		),
+	)
+
+	return simService, serviceService, providerService, usedService
 }
