@@ -8,7 +8,7 @@ import (
 )
 
 type ServiceService interface {
-	Add(ctx context.Context, s core.Service) error
+	Add(ctx context.Context, s *core.Service) (int, error)
 	Remove(ctx context.Context, id int) error
 	GetServiceList(ctx context.Context) (*core.List[*core.Service], error)
 }

@@ -16,12 +16,12 @@ func NewServiceService(repo Repository[*core.Service]) *ServiceService {
 	return ss
 }
 
-func (ss *ServiceService) Add(ctx context.Context, s core.Service) error {
-	panic("implement")
+func (ss *ServiceService) Add(ctx context.Context, s *core.Service) (int, error) {
+	return ss.repository.Save(ctx, s)
 }
 func (ss *ServiceService) Remove(ctx context.Context, id int) error {
-	panic("implement")
+	return ss.repository.Remove(ctx, id)
 }
 func (ss *ServiceService) GetServiceList(ctx context.Context) (*core.List[*core.Service], error) {
-	panic("implement")
+	return ss.repository.GetList(ctx)
 }
