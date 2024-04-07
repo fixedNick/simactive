@@ -66,8 +66,8 @@ message SimData {
     bool IsBlocked = 6;
 }
 message USFSRequest {
-    string Number = 1;
-    int32 Service = 2;
+    int32 SimID = 1;
+    int32 ServiceID = 2;
 }
 message USFSResponse {
     bool IsUsed = 1;
