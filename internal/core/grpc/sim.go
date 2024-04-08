@@ -5,7 +5,12 @@ import (
 	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
 	"simactive/internal/core"
+	"simactive/internal/repository"
+	"strconv"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type SimService interface {
@@ -31,19 +36,52 @@ func NewGRPCSimService(ss SimService, timeout time.Duration) GRPCSimService {
 }
 func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb.AddSimResponse, error) {
 
+	number := req.SimData.Number
+
+	// Validates the length of phone number. Length of phone number should be in range from 11 to 15.
+	// And all the digits in the phone number should be in range from 0 to 9
+	// Example: 1 999 888 77 66
+	if !validatePhoneNumber(number) {
+		return nil, status.Errorf(codes.InvalidArgument, "Bad phone number. Please use correct phone number. Example: 1 999 888 77 66")
+	}
+
+	if req.SimData.ProviderID == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Bad provider id.")
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
 	defer cancel()
 
 	sim := core.NewSim(0, req.SimData.Number, int(req.SimData.ProviderID), req.SimData.IsActivated, req.SimData.ActivateUntil, req.SimData.IsBlocked)
 	id, err := gs.simService.Add(ctx, &sim)
 	if err != nil {
-		return nil, err
+
+		if err == repository.ErrSimAlreadyExists {
+			return nil, status.Errorf(codes.AlreadyExists, "sim card with number %s already exists", sim.Number())
+		}
+
+		// TODO: add log
+		return nil, ErrInternal
 	}
 	return &pb.AddSimResponse{
-		IsAdded: true,
+		Id:      int32(id),
 		Message: fmt.Sprintf("sim card with number %s added. Sim id is `%d`", sim.Number(), id),
 	}, nil
 }
+
+// validatePhoneNumber checks if the phone number is within a valid length range.
+//
+// It takes a string parameter 'number' representing the phone number.
+// It returns a boolean value indicating if the phone number is valid.
+func validatePhoneNumber(number string) bool {
+	if len(number) < 8 || len(number) > 15 {
+		return false
+	}
+
+	_, err := strconv.Atoi(number)
+	return err == nil
+}
+
 func (gs GRPCSimService) DeleteSim(ctx context.Context, req *pb.DeleteSimRequest) (*pb.DeleteSimResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
 	defer cancel()
