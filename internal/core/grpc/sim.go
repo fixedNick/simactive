@@ -152,10 +152,17 @@ func (gs GRPCSimService) ActivateSim(ctx context.Context, req *pb.ActivateSimReq
 	}, nil
 }
 func (gs GRPCSimService) SetSimBlocked(ctx context.Context, req *pb.SSBRequest) (*pb.SSBResponse, error) {
+	if req.GetId() == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid id, id must be greater than 0")
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
 	defer cancel()
 
 	if err := gs.simService.BlockSim(ctx, int(req.Id)); err != nil {
+		if err == repository.ErrSimNotFound {
+			return nil, status.Errorf(codes.NotFound, "sim card with id %d not found", req.Id)
+		}
 		return nil, ErrInternal
 	}
 
