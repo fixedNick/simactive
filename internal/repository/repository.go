@@ -3,9 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"simactive/internal/core"
+
+	mysql "github.com/go-sql-driver/mysql"
 )
 
 type Sql struct {
@@ -69,6 +72,11 @@ func (r *Repository[T]) Save(ctx context.Context, obj core.DBModel) (int, error)
 
 	res, err := r.Db.ExecContext(ctx, query, args...)
 	if err != nil {
+		var mysqlError *mysql.MySQLError
+		if errors.As(err, &mysqlError) && mysqlError.Number == 1062 {
+			return 0, ErrSimAlreadyExists
+		}
+
 		return 0, err
 	}
 
@@ -76,7 +84,6 @@ func (r *Repository[T]) Save(ctx context.Context, obj core.DBModel) (int, error)
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("Inserted id: ", id)
 
 	// Save into in-memory storage
 	obj.SetKey(int(id))
@@ -88,7 +95,7 @@ func (r *Repository[T]) Remove(ctx context.Context, id int) error {
 	obj, ok := r.InMemoryList[id]
 	if !ok {
 		// if not - return error
-		return fmt.Errorf("locally not found object of type `%T` with id `%d`", obj, id)
+		return ErrSimNotFound
 	}
 
 	// then delete locally
@@ -126,12 +133,16 @@ func (r *Repository[T]) GetList(ctx context.Context) (*core.List[T], error) {
 
 	switch interface{}(v).(type) {
 	case *core.Sim:
+		v = any(&core.Sim{}).(T)
 		query = "SELECT * FROM sim"
 	case *core.Service:
+		v = any(&core.Service{}).(T)
 		query = "SELECT * FROM service"
 	case *core.Provider:
+		v = any(&core.Provider{}).(T)
 		query = "SELECT * FROM provider"
 	case *core.Used:
+		v = any(&core.Used{}).(T)
 		query = "SELECT * FROM used"
 	default:
 		panic("impossible")
@@ -191,7 +202,7 @@ func (r *Repository[T]) Update(ctx context.Context, s T) error {
 	// send update query
 
 	if _, ok := r.InMemoryList[s.GetKey()]; !ok {
-		return fmt.Errorf("sim: %v. Not found in memory", s)
+		return ErrSimNotFound
 	}
 	// Save local
 	r.InMemoryList[s.GetKey()] = s

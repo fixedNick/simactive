@@ -8,7 +8,7 @@ type Used struct {
 	id          int
 	simId       int
 	serviceId   int
-	blocked     bool
+	isBlocked   bool
 	blockedInfo string
 }
 
@@ -23,8 +23,8 @@ func (u *Used) SimID() int {
 func (u *Used) ServiceID() int {
 	return u.serviceId
 }
-func (u *Used) Blocked() bool {
-	return u.blocked
+func (u *Used) IsBlocked() bool {
+	return u.isBlocked
 }
 
 func (u *Used) BlockedInfo() string {
@@ -52,8 +52,8 @@ func (u *Used) SetSimID(simID int) {
 func (u *Used) SetServiceID(sid int) {
 	u.serviceId = sid
 }
-func (u *Used) SetBlocked(status bool) {
-	u.blocked = status
+func (u *Used) SetIsBlocked(status bool) {
+	u.isBlocked = status
 }
 func (u *Used) SetBlockedInfo(binfo string) {
 	u.blockedInfo = binfo
@@ -62,12 +62,12 @@ func (u *Used) SetBlockedInfo(binfo string) {
 // [Scan] return object of [Sim] whitch is [Scannable], and map index [int]
 // If any errors ocured while scanning it will be in [error]
 func (u *Used) ScanRows(row *sql.Rows) (int, error) {
-	err := row.Scan(&u.id, &u.simId, &u.serviceId, &u.blocked, &u.blockedInfo)
+	err := row.Scan(&u.id, &u.simId, &u.serviceId, &u.isBlocked, &u.blockedInfo)
 	return u.id, err
 }
 
 func (u *Used) ScanRow(row *sql.Row) error {
-	err := row.Scan(&u.id, &u.simId, &u.serviceId, &u.blocked, &u.blockedInfo)
+	err := row.Scan(&u.id, &u.simId, &u.serviceId, &u.isBlocked, &u.blockedInfo)
 	return err
 }
 
