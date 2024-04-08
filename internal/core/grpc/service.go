@@ -2,10 +2,15 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
 	"simactive/internal/core"
+	"simactive/internal/repository"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ServiceService interface {
@@ -34,23 +39,31 @@ func NewGRPCServiceService(ss ServiceService, timeout time.Duration) GRPCService
 // req: The request to add a service.
 // Returns the response indicating if the service was added successfully or an error.
 func (gss GRPCServiceService) AddService(ctx context.Context, req *pb.AddServiceRequest) (*pb.AddServiceResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, gss.timeout)
-	defer cancel()
 
 	name := req.GetName()
 	if name == "" {
-		return nil, fmt.Errorf("name is empty")
+		return nil, status.Error(codes.InvalidArgument, "service name cannot be empty")
 	}
+
+	if len(name) > 64 {
+		return nil, status.Error(codes.InvalidArgument, "service name cannot be longer than 64 characters")
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, gss.timeout)
+	defer cancel()
 
 	service := core.Service{}.WithName(name)
 
-	_, err := gss.serviceService.Add(ctx, &service)
+	id, err := gss.serviceService.Add(ctx, &service)
 	if err != nil {
+		if err == repository.ErrAlreadyExists {
+			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("service with name %s already exists", name))
+		}
 		return nil, err
 	}
 
 	return &pb.AddServiceResponse{
-		IsAdded: true,
+		Id: int32(id),
 	}, nil
 }
 
@@ -58,6 +71,11 @@ func (gss GRPCServiceService) AddService(ctx context.Context, req *pb.AddService
 // ctx context.Context, req *pb.DeleteServiceRequest
 // *pb.DeleteServiceResponse, error
 func (gss GRPCServiceService) DeleteService(ctx context.Context, req *pb.DeleteServiceRequest) (*pb.DeleteServiceResponse, error) {
+
+	if req.GetID() == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid id, id must be greater than 0")
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, gss.timeout)
 	defer cancel()
 
@@ -68,6 +86,9 @@ func (gss GRPCServiceService) DeleteService(ctx context.Context, req *pb.DeleteS
 
 	err := gss.serviceService.Remove(ctx, id)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil, status.Errorf(codes.NotFound, "service with id %d not found", id)
+		}
 		return nil, err
 	}
 

@@ -326,7 +326,7 @@ var Sim_ServiceDesc = grpc.ServiceDesc{
 type ServiceClient interface {
 	AddService(ctx context.Context, in *AddServiceRequest, opts ...grpc.CallOption) (*AddServiceResponse, error)
 	DeleteService(ctx context.Context, in *DeleteServiceRequest, opts ...grpc.CallOption) (*DeleteServiceResponse, error)
-	GetSetviceList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GSLResponse, error)
+	GetServiceList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GSLResponse, error)
 }
 
 type serviceClient struct {
@@ -355,9 +355,9 @@ func (c *serviceClient) DeleteService(ctx context.Context, in *DeleteServiceRequ
 	return out, nil
 }
 
-func (c *serviceClient) GetSetviceList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GSLResponse, error) {
+func (c *serviceClient) GetServiceList(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GSLResponse, error) {
 	out := new(GSLResponse)
-	err := c.cc.Invoke(ctx, "/Service/GetSetviceList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/Service/GetServiceList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -370,7 +370,7 @@ func (c *serviceClient) GetSetviceList(ctx context.Context, in *Empty, opts ...g
 type ServiceServer interface {
 	AddService(context.Context, *AddServiceRequest) (*AddServiceResponse, error)
 	DeleteService(context.Context, *DeleteServiceRequest) (*DeleteServiceResponse, error)
-	GetSetviceList(context.Context, *Empty) (*GSLResponse, error)
+	GetServiceList(context.Context, *Empty) (*GSLResponse, error)
 	mustEmbedUnimplementedServiceServer()
 }
 
@@ -384,8 +384,8 @@ func (UnimplementedServiceServer) AddService(context.Context, *AddServiceRequest
 func (UnimplementedServiceServer) DeleteService(context.Context, *DeleteServiceRequest) (*DeleteServiceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
 }
-func (UnimplementedServiceServer) GetSetviceList(context.Context, *Empty) (*GSLResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSetviceList not implemented")
+func (UnimplementedServiceServer) GetServiceList(context.Context, *Empty) (*GSLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServiceList not implemented")
 }
 func (UnimplementedServiceServer) mustEmbedUnimplementedServiceServer() {}
 
@@ -436,20 +436,20 @@ func _Service_DeleteService_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Service_GetSetviceList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Service_GetServiceList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServiceServer).GetSetviceList(ctx, in)
+		return srv.(ServiceServer).GetServiceList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Service/GetSetviceList",
+		FullMethod: "/Service/GetServiceList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServiceServer).GetSetviceList(ctx, req.(*Empty))
+		return srv.(ServiceServer).GetServiceList(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -470,8 +470,8 @@ var Service_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Service_DeleteService_Handler,
 		},
 		{
-			MethodName: "GetSetviceList",
-			Handler:    _Service_GetSetviceList_Handler,
+			MethodName: "GetServiceList",
+			Handler:    _Service_GetServiceList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

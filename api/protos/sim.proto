@@ -16,7 +16,7 @@ service Sim {
 service Service {
     rpc AddService (AddServiceRequest) returns (AddServiceResponse) {}
     rpc DeleteService (DeleteServiceRequest) returns (DeleteServiceResponse) {}
-    rpc GetSetviceList (Empty) returns (GSLResponse) {}
+    rpc GetServiceList (Empty) returns (GSLResponse) {}
 }
 
 service Used {
@@ -89,7 +89,7 @@ message AddServiceRequest {
     string Name = 1;
 }
 message AddServiceResponse {
-    bool IsAdded = 1;
+    int32 id = 1;
 
 }
 message DeleteServiceRequest {

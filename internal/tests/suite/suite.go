@@ -18,8 +18,9 @@ import (
 
 type Suite struct {
 	*testing.T
-	Cfg       config.Config
-	SimClient SimHelper.SimClient
+	Cfg           config.Config
+	SimClient     SimHelper.SimClient
+	ServiceClient SimHelper.ServiceClient
 }
 
 const (
@@ -45,17 +46,18 @@ func NewSuite(t *testing.T) (context.Context, *Suite) {
 		grpcArrdress(*cfg),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
+
 	if err != nil {
 		t.Fatalf("grpc server connection failer: %v", err)
 	}
 
 	return ctx, &Suite{
-		T:         t,
-		Cfg:       *cfg,
-		SimClient: SimHelper.NewSimClient(cc),
+		T:             t,
+		Cfg:           *cfg,
+		SimClient:     SimHelper.NewSimClient(cc),
+		ServiceClient: SimHelper.NewServiceClient(cc),
 	}
 }
-
 func grpcArrdress(cfg config.Config) string {
 	return net.JoinHostPort(grpcHost, strconv.Itoa(cfg.GRPC.Port))
 }

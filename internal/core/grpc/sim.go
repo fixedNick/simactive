@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
 	"simactive/internal/core"
@@ -56,7 +57,7 @@ func (gs GRPCSimService) AddSim(ctx context.Context, req *pb.AddSimRequest) (*pb
 	id, err := gs.simService.Add(ctx, &sim)
 	if err != nil {
 
-		if err == repository.ErrSimAlreadyExists {
+		if errors.Is(err, repository.ErrAlreadyExists) {
 			return nil, status.Errorf(codes.AlreadyExists, "sim card with number %s already exists", sim.Number())
 		}
 
@@ -92,7 +93,7 @@ func (gs GRPCSimService) DeleteSim(ctx context.Context, req *pb.DeleteSimRequest
 	defer cancel()
 	if err := gs.simService.Remove(ctx, int(req.GetId())); err != nil {
 
-		if err == repository.ErrSimNotFound {
+		if errors.Is(err, repository.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "sim card with id %d not found", req.GetId())
 		}
 		return nil, ErrInternal
@@ -140,7 +141,7 @@ func (gs GRPCSimService) ActivateSim(ctx context.Context, req *pb.ActivateSimReq
 
 	if err := gs.simService.ActivateSim(ctx, int(req.Id)); err != nil {
 
-		if err == repository.ErrSimNotFound {
+		if errors.Is(err, repository.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "sim card with id %d not found", req.Id)
 		}
 
@@ -160,7 +161,7 @@ func (gs GRPCSimService) SetSimBlocked(ctx context.Context, req *pb.SSBRequest) 
 	defer cancel()
 
 	if err := gs.simService.BlockSim(ctx, int(req.Id)); err != nil {
-		if err == repository.ErrSimNotFound {
+		if errors.Is(err, repository.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "sim card with id %d not found", req.Id)
 		}
 		return nil, ErrInternal

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"log/slog"
 	"simactive/internal/core"
 
@@ -52,9 +51,9 @@ func (r *Repository[T]) Save(ctx context.Context, obj core.DBModel) (int, error)
 		}
 	case *core.Service:
 		// Prepare SQL query
-		query = "INSER INTO service VALUES (?, ?)"
+		query = "INSERT INTO service (name) VALUES (?)"
 		args = []interface{}{
-			0, obj.Name(),
+			obj.Name(),
 		}
 	case *core.Provider:
 		query = "INSERT INTO provider VALUES (?, ?)"
@@ -74,7 +73,7 @@ func (r *Repository[T]) Save(ctx context.Context, obj core.DBModel) (int, error)
 	if err != nil {
 		var mysqlError *mysql.MySQLError
 		if errors.As(err, &mysqlError) && mysqlError.Number == 1062 {
-			return 0, ErrSimAlreadyExists
+			return 0, ErrAlreadyExists
 		}
 
 		return 0, err
@@ -95,7 +94,7 @@ func (r *Repository[T]) Remove(ctx context.Context, id int) error {
 	obj, ok := r.InMemoryList[id]
 	if !ok {
 		// if not - return error
-		return ErrSimNotFound
+		return ErrNotFound
 	}
 
 	// then delete locally
@@ -108,7 +107,7 @@ func (r *Repository[T]) Remove(ctx context.Context, id int) error {
 	case *core.Sim:
 		query = "DELETE FROM sim WHERE id = ?"
 	case *core.Service:
-		query = "DELTE FROM service WHERE id = ?"
+		query = "DELETE FROM service WHERE id = ?"
 	case *core.Provider:
 		query = "DELETE FROM provider WHERE id = ?"
 	case *core.Used:
@@ -119,7 +118,7 @@ func (r *Repository[T]) Remove(ctx context.Context, id int) error {
 
 	_, err := r.Db.ExecContext(ctx, query, id)
 	if err != nil {
-		return fmt.Errorf("error ocured on deleting row from sql. Delete type: `%T`, id: `%d`", obj, id)
+		return err
 	}
 	return nil
 }
@@ -196,7 +195,7 @@ func (r *Repository[T]) ByID(ctx context.Context, id int) (T, error) {
 	err := v.ScanRow(row)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return v, ErrSimNotFound
+			return v, ErrNotFound
 		}
 		return v, err
 	}
@@ -209,7 +208,7 @@ func (r *Repository[T]) Update(ctx context.Context, s T) error {
 	// send update query
 
 	if _, ok := r.InMemoryList[s.GetKey()]; !ok {
-		return ErrSimNotFound
+		return ErrNotFound
 	}
 	// Save local
 	r.InMemoryList[s.GetKey()] = s
