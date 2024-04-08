@@ -110,7 +110,7 @@ message AddSimRequest {
 }
 message AddSimResponse {
     string Message = 1;         // Message of successfull operation
-    bool IsAdded = 2;           // True when operation finished as success
+    int32 id = 2;               // ID of new added sim
 }
 message DeleteSimRequest {
     int32 id = 1;          // phone number to delete
