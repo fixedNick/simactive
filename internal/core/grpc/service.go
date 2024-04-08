@@ -72,7 +72,7 @@ func (gss GRPCServiceService) DeleteService(ctx context.Context, req *pb.DeleteS
 	}
 
 	return &pb.DeleteServiceResponse{
-		IsDeleted: true,
+		Id: req.GetID(),
 	}, nil
 }
 

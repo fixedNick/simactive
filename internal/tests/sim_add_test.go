@@ -1,11 +1,10 @@
 package tests
 
 import (
-	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
+	"simactive/internal/repository"
 	"simactive/internal/tests/suite"
 	"testing"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,11 +14,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestAddSim_HappyPath is a test function for adding a sim card in a happy path scenario.
+//
+// It uses the testing context and suite, generates a fake phone number and date, then adds a sim card with the provided details.
+// It also checks the response and expected sim data.
 func TestAddSim_HappyPath(t *testing.T) {
 	ctx, st := suite.NewSuite(t)
 
-	phone := generateFakePhoneNumber()
-	activateUntil := generateFakeDateUnix()
+	phone := suite.GenerateFakePhoneNumber()
+	activateUntil := suite.GenerateFakeDateUnix()
 
 	resp, err := st.SimClient.AddSim(
 		ctx,
@@ -52,13 +55,17 @@ func TestAddSim_HappyPath(t *testing.T) {
 	assert.Contains(t, r.SimList, &expectedSimData)
 }
 
+// TestAddSim_DuplicateSim is a test function for adding a duplicate sim.
+//
+// It tests adding a sim with the same phone number and expects an error to be returned.
+// It also checks the error code and message.
 func TestAddSim_DuplicateSim(t *testing.T) {
 
-	ctx, suite := suite.NewSuite(t)
-	phone := generateFakePhoneNumber()
-	activateUntil := generateFakeDateUnix()
+	ctx, ss := suite.NewSuite(t)
+	phone := suite.GenerateFakePhoneNumber()
+	activateUntil := suite.GenerateFakeDateUnix()
 
-	resp, err := suite.SimClient.AddSim(
+	resp, err := ss.SimClient.AddSim(
 		ctx,
 		&pb.AddSimRequest{
 			SimData: &pb.AddSimData{
@@ -74,7 +81,7 @@ func TestAddSim_DuplicateSim(t *testing.T) {
 	require.NotNil(t, resp)
 	assert.NotEmpty(t, resp.GetId())
 
-	resp, err = suite.SimClient.AddSim(
+	resp, err = ss.SimClient.AddSim(
 		ctx,
 		&pb.AddSimRequest{
 			SimData: &pb.AddSimData{
@@ -95,15 +102,19 @@ func TestAddSim_DuplicateSim(t *testing.T) {
 
 	// check response
 	assert.Empty(t, resp.GetId())
-	assert.ErrorContains(t, err, fmt.Sprintf("sim card with number %s already exists", phone))
+	assert.ErrorContains(t, err, repository.ErrSimAlreadyExists.Error())
 }
 
+// TestAddSim_FailCases tests the failure cases of the AddSim function.
+//
+// It tests various scenarios where the AddSim function should return an error.
+// Also it checks the error code and message.
 func TestAddSim_FailCases(t *testing.T) {
 
 	ctx, s := suite.NewSuite(t)
 
 	provider := gofakeit.Number(1, 999)
-	randomNumber := generateFakePhoneNumber()
+	randomNumber := suite.GenerateFakePhoneNumber()
 
 	tests := []struct {
 		name               string
@@ -143,14 +154,13 @@ func TestAddSim_FailCases(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := s.SimClient.AddSim(ctx, &pb.AddSimRequest{
 				SimData: &pb.AddSimData{
 					Number:        tt.number,
 					ProviderID:    int32(tt.providerID),
 					IsActivated:   gofakeit.Bool(),
-					ActivateUntil: generateFakeDateUnix(),
+					ActivateUntil: suite.GenerateFakeDateUnix(),
 					IsBlocked:     gofakeit.Bool(),
 				},
 			})
@@ -162,18 +172,4 @@ func TestAddSim_FailCases(t *testing.T) {
 			assert.Equal(t, tt.expectedStatusCode, st.Code())
 		})
 	}
-}
-
-func generateFakePhoneNumber() string {
-	countryCode := gofakeit.Number(1, 999)
-	operatorCode := gofakeit.Number(100, 999)
-	phoneNumber := gofakeit.Number(1000, 9999)
-
-	return fmt.Sprintf("%d%d%d", countryCode, operatorCode, phoneNumber)
-}
-
-func generateFakeDateUnix() int64 {
-	d := int64(gofakeit.Number(int(time.Now().Unix()), int(time.Now().Unix()+int64((time.Hour*24*365).Seconds()))))
-	fmt.Println("Random date generated:", d)
-	return d
 }

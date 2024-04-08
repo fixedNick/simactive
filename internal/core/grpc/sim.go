@@ -83,13 +83,22 @@ func validatePhoneNumber(number string) bool {
 }
 
 func (gs GRPCSimService) DeleteSim(ctx context.Context, req *pb.DeleteSimRequest) (*pb.DeleteSimResponse, error) {
+
+	if req.GetId() == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid id, id must be greater than 0")
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, gs.timeout)
 	defer cancel()
 	if err := gs.simService.Remove(ctx, int(req.GetId())); err != nil {
+
+		if err == repository.ErrSimNotFound {
+			return nil, status.Errorf(codes.NotFound, "sim card with id %d not found", req.GetId())
+		}
 		return nil, ErrInternal
 	}
 	return &pb.DeleteSimResponse{
-		IsDeleted: true,
+		Id: req.GetId(),
 	}, nil
 }
 func (gs GRPCSimService) GetSimList(ctx context.Context, req *pb.Empty) (*pb.SimList, error) {

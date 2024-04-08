@@ -96,7 +96,7 @@ message DeleteServiceRequest {
     int32 ID = 1;
 }
 message DeleteServiceResponse {
-    bool IsDeleted = 1;
+    int32 id = 1;
 }
 message AddSimData {
     string Number = 1;
@@ -109,13 +109,13 @@ message AddSimRequest {
     AddSimData SimData = 1;
 }
 message AddSimResponse {
-    string Message = 1;         // Message of successfull operation
-    int32 id = 2;               // ID of new added sim
+    string Message = 1;        
+    int32 id = 2;              
 }
 message DeleteSimRequest {
-    int32 id = 1;          // phone number to delete
+    int32 id = 1;          
 }
 
 message DeleteSimResponse {
-    bool IsDeleted = 1;         // Is operation succeed 
+    int32 id = 1;         
 }
