@@ -179,18 +179,25 @@ func (r *Repository[T]) ByID(ctx context.Context, id int) (T, error) {
 
 	switch any(v).(type) {
 	case *core.Sim:
+		v = any(&core.Sim{}).(T)
 		query = "SELECT * FROM sim WHERE id = ?"
 	case *core.Service:
+		v = any(&core.Service{}).(T)
 		query = "SELECT * FROM service WHERE id = ?"
 	case *core.Provider:
+		v = any(&core.Provider{}).(T)
 		query = "SELECT * FROM provider WHERE id = ?"
 	case *core.Used:
+		v = any(&core.Used{}).(T)
 		query = "SELECT * FROM used WHERE id = ?"
 	}
 
 	row := r.Db.QueryRowContext(ctx, query, id)
 	err := v.ScanRow(row)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return v, ErrSimNotFound
+		}
 		return v, err
 	}
 

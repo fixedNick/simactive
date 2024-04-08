@@ -1,8 +1,8 @@
 package tests
 
 import (
+	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
-	"simactive/internal/repository"
 	"simactive/internal/tests/suite"
 	"testing"
 
@@ -102,7 +102,7 @@ func TestAddSim_DuplicateSim(t *testing.T) {
 
 	// check response
 	assert.Empty(t, resp.GetId())
-	assert.ErrorContains(t, err, repository.ErrSimAlreadyExists.Error())
+	assert.ErrorContains(t, err, fmt.Sprintf("sim card with number %s already exists", phone))
 }
 
 // TestAddSim_FailCases tests the failure cases of the AddSim function.

@@ -15,6 +15,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestDeleteSim_HappyPath tests the successful deletion of a SIM.
+// Uses a fake SIM data to add a SIM, then deletes it and verifies the deletion.
 func TestDeleteSim_HappyPath(t *testing.T) {
 	ctx, ss := suite.NewSuite(t)
 
@@ -58,19 +60,8 @@ func TestDeleteSim_HappyPath(t *testing.T) {
 	assert.NotEmpty(t, deleteResp)
 }
 
-func TestDeleteSim_SimNotFound(t *testing.T) {
-	ctx, ss := suite.NewSuite(t)
-
-	deleteResp, err := ss.SimClient.DeleteSim(
-		ctx,
-		&pb.DeleteSimRequest{
-			Id: 999999999, // hope that sim with this id does not exist ;)
-		},
-	)
-	require.Error(t, err)
-	assert.Empty(t, deleteResp.GetId())
-}
-
+// TestDeleteSim_FailCases tests the failure cases of the DeleteSim function.
+// It tests deleting a SIM card with a not existing ID and with an empty ID.
 func TestDeleteSim_FailCases(t *testing.T) {
 	ctx, s := suite.NewSuite(t)
 	// invalid input
