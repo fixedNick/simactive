@@ -54,9 +54,17 @@ func (r *Repository[T]) Save(ctx context.Context, obj core.DBModel) (int, error)
 			0, obj.Name(),
 		}
 	case *core.Provider:
-		panic("implement")
+		query = "INSERT INTO provider VALUES (?, ?)"
+		args = []interface{}{
+			0, obj.Name(),
+		}
+	case *core.Used:
+		query = "INSERT INTO used VALUES (?,?,?,?,?)"
+		args = []interface{}{
+			0, obj.SimID(), obj.ServiceID(), obj.IsBlocked(), obj.BlockedInfo(),
+		}
 	default:
-		panic("implement")
+		panic("impossible")
 	}
 
 	res, err := r.Db.ExecContext(ctx, query, args...)
@@ -94,6 +102,12 @@ func (r *Repository[T]) Remove(ctx context.Context, id int) error {
 		query = "DELETE FROM sim WHERE id = ?"
 	case *core.Service:
 		query = "DELTE FROM service WHERE id = ?"
+	case *core.Provider:
+		query = "DELETE FROM provider WHERE id = ?"
+	case *core.Used:
+		query = "DELETE FROM used WHERE id = ?"
+	default:
+		panic("Remove undefined type")
 	}
 
 	_, err := r.Db.ExecContext(ctx, query, id)
@@ -115,6 +129,10 @@ func (r *Repository[T]) GetList(ctx context.Context) (*core.List[T], error) {
 		query = "SELECT * FROM sim"
 	case *core.Service:
 		query = "SELECT * FROM service"
+	case *core.Provider:
+		query = "SELECT * FROM provider"
+	case *core.Used:
+		query = "SELECT * FROM used"
 	default:
 		panic("impossible")
 	}
@@ -147,24 +165,19 @@ func (r *Repository[T]) ByID(ctx context.Context, id int) (T, error) {
 
 	var v T
 	var query string
-	var args []interface{}
 
 	switch any(v).(type) {
 	case *core.Sim:
 		query = "SELECT * FROM sim WHERE id = ?"
-		args = []interface{}{
-			id,
-		}
 	case *core.Service:
 		query = "SELECT * FROM service WHERE id = ?"
-		args = []interface{}{
-			id,
-		}
 	case *core.Provider:
+		query = "SELECT * FROM provider WHERE id = ?"
 	case *core.Used:
+		query = "SELECT * FROM used WHERE id = ?"
 	}
 
-	row := r.Db.QueryRowContext(ctx, query, args...)
+	row := r.Db.QueryRowContext(ctx, query, id)
 	err := v.ScanRow(row)
 	if err != nil {
 		return v, err
@@ -204,7 +217,20 @@ func (r *Repository[T]) Update(ctx context.Context, s T) error {
 			obj.Id(),
 		}
 	case *core.Provider:
+		query = "UPDATE provider SET name = ? WHERE id = ?"
+		args = []interface{}{
+			obj.Name(),
+			obj.Id(),
+		}
 	case *core.Used:
+		query = "UPDATE used SET sim_id = ?, service_id = ?, is_blocked = ?, blocked_info = ? WHERE id = ?"
+		args = []interface{}{
+			obj.SimID(),
+			obj.ServiceID(),
+			obj.IsBlocked(),
+			obj.BlockedInfo(),
+			obj.Id(),
+		}
 	}
 
 	_, err := r.Db.ExecContext(ctx, query, args...)
