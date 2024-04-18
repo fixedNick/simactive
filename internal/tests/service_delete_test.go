@@ -11,7 +11,6 @@ import (
 	"simactive/internal/tests/suite"
 	"testing"
 
-	"github.com/brianvoe/gofakeit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +24,7 @@ func TestServiceDelete_HappyPath(t *testing.T) {
 
 	ctx, s := suite.NewSuite(t)
 
-	service := core.NewService(0, gofakeit.BS())
+	service := core.NewService(0, suite.GenerateFakeString(30))
 
 	addResp, err := s.ServiceClient.AddService(ctx, &pb.AddServiceRequest{Name: service.Name()})
 	require.NoError(t, err)

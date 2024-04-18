@@ -20,7 +20,7 @@ import (
 func TestDeleteSim_HappyPath(t *testing.T) {
 	ctx, ss := suite.NewSuite(t)
 
-	fakeProvider := core.Provider{}.WithName(gofakeit.BS())
+	fakeProvider := core.Provider{}.WithName(suite.GenerateFakeString(16))
 	sim := core.NewSim(
 		0,
 		suite.GenerateFakePhoneNumber(),

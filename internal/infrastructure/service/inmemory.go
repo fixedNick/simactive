@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 )
 
 type ServiceInMemory struct {
@@ -74,7 +75,7 @@ func (si *ServiceInMemory) Remove(ctx context.Context, id int) error {
 			"Failed to retrieve service",
 			slog.String("op", op),
 			slog.Int("service id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -128,7 +129,7 @@ func (si *ServiceInMemory) Update(ctx context.Context, s *core.Service) error {
 			"Failed to retrieve service",
 			slog.String("op", op),
 			slog.Int("service id", s.Id()),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}

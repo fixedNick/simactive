@@ -75,3 +75,14 @@ func GenerateFakePhoneNumber() string {
 func GenerateFakeDateUnix() int64 {
 	return int64(gofakeit.Number(int(time.Now().Unix()), int(time.Now().Unix()+int64((time.Hour*24*365).Seconds()))))
 }
+
+func GenerateFakeString(length int) string {
+	var result string
+
+	for length > 0 {
+		length--
+		result += string(gofakeit.Letter())
+	}
+
+	return result
+}

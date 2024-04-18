@@ -22,7 +22,7 @@ func TestAddService_HappyPath(t *testing.T) {
 
 	ctx, s := suite.NewSuite(t)
 
-	serviceName := gofakeit.BS()
+	serviceName := suite.GenerateFakeString(30)
 
 	respAdd, err := s.ServiceClient.AddService(ctx, &pb.AddServiceRequest{Name: serviceName})
 

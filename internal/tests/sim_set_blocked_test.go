@@ -24,7 +24,7 @@ func TestSetBlockedSim_HappyPath(t *testing.T) {
 	// block sim
 	// check that sim is blocked
 
-	fakeProvider := core.Provider{}.WithName(gofakeit.BS())
+	fakeProvider := core.Provider{}.WithName(suite.GenerateFakeString(16))
 	sim := core.NewSim(
 		0,
 		suite.GenerateFakePhoneNumber(),

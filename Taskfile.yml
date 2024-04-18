@@ -11,3 +11,14 @@ tasks:
     dir: "cmd/app"
     cmds:
       - go run main.go "--config=../../config/app/local.yaml"
+
+  clean:
+    desc: "Cleans test cache"
+    cmds:
+      - go clean -testcache
+    
+  cr:
+    desc: "Cleans cache and runs a progam"
+    cmds:
+      - task clean
+      - task run

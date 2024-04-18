@@ -9,6 +9,7 @@ import (
 	"simactive/internal/config"
 	"simactive/internal/core/grpc"
 	repository "simactive/internal/infrastructure"
+	"simactive/internal/lib/logger/handlers/slogpretty"
 	"simactive/internal/services"
 	coresql "simactive/internal/sql"
 	"syscall"
@@ -20,14 +21,14 @@ func main() {
 	cfg := config.MustLoad()
 
 	// Initialize logger
-	logger := slog.Default()
+	logger := setupLogger()
 
 	// Init db
 	db := coresql.MustInit()
 
 	// Init services
 	repo := repository.NewRepository(logger, db)
-	simService, serviceService, providerService, usedService := InitServices(db, logger, repo)
+	simService, serviceService, providerService, usedService := initServices(db, logger, repo)
 
 	// Init gRPC Server
 	gs := grpc.NewGRPCServer(cfg)
@@ -48,7 +49,7 @@ func main() {
 	log.Print("Gracefull shutdown")
 }
 
-func InitServices(db *sql.DB, logger *slog.Logger, repo *repository.Repository) (*services.SimService, *services.ServiceService, *services.ProviderService, *services.UsedService) {
+func initServices(db *sql.DB, logger *slog.Logger, repo *repository.Repository) (*services.SimService, *services.ServiceService, *services.ProviderService, *services.UsedService) {
 
 	simService := services.NewSimService(repo)
 
@@ -59,4 +60,16 @@ func InitServices(db *sql.DB, logger *slog.Logger, repo *repository.Repository) 
 	usedService := services.NewUsedService(repo)
 
 	return simService, serviceService, providerService, usedService
+}
+
+func setupLogger() *slog.Logger {
+	opts := slogpretty.PrettyHandlerOptions{
+		SlogOpts: &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		},
+	}
+
+	handler := opts.NewPrettyHandler(os.Stdout)
+
+	return slog.New(handler)
 }

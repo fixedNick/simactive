@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 )
 
 type UsedInMemoryRepository struct {
@@ -28,12 +29,11 @@ func (ir *UsedInMemoryRepository) Add(ctx context.Context, id int, simId int, se
 		ir.logger.Info(
 			"Used already exists",
 			slog.String("op", op),
-			slog.Group("in", slog.Int("id", id),
-				slog.Int("sim id", simId),
-				slog.Int("service id", serviceId),
-				slog.Bool("is blocked", isBlocked),
-				slog.String("blocked info", blockedInfo),
-			),
+			slog.Int("id", id),
+			slog.Int("sim id", simId),
+			slog.Int("service id", serviceId),
+			slog.Bool("is blocked", isBlocked),
+			slog.String("blocked info", blockedInfo),
 		)
 		return repoerrors.ErrAlreadyExists
 	}
@@ -44,12 +44,11 @@ func (ir *UsedInMemoryRepository) Add(ctx context.Context, id int, simId int, se
 	ir.logger.Info(
 		"Used added",
 		slog.String("op", op),
-		slog.Group("in", slog.Int("id", id),
-			slog.Int("sim id", simId),
-			slog.Int("service id", serviceId),
-			slog.Bool("is blocked", isBlocked),
-			slog.String("blocked info", blockedInfo),
-		),
+		slog.Int("id", id),
+		slog.Int("sim id", simId),
+		slog.Int("service id", serviceId),
+		slog.Bool("is blocked", isBlocked),
+		slog.String("blocked info", blockedInfo),
 	)
 	return nil
 }
@@ -81,7 +80,7 @@ func (ir *UsedInMemoryRepository) ByID(ctx context.Context, id int) (*core.Used,
 			"Failed to retrieve used",
 			slog.String("op", op),
 			slog.Int("used id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -90,7 +89,6 @@ func (ir *UsedInMemoryRepository) ByID(ctx context.Context, id int) (*core.Used,
 		"Used successfully retrieved",
 		slog.String("op", op),
 		slog.Int("used id", id),
-		slog.Any("used", *used),
 	)
 	return used, nil
 }
@@ -111,7 +109,7 @@ func (ir *UsedInMemoryRepository) Update(ctx context.Context, s *core.Used) erro
 			"Failed to retrieve used",
 			slog.String("op", op),
 			slog.Int("used id", s.Id()),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -122,7 +120,6 @@ func (ir *UsedInMemoryRepository) Update(ctx context.Context, s *core.Used) erro
 		"Used successfully updated",
 		slog.String("op", op),
 		slog.Int("used id", s.Id()),
-		slog.Any("used", *s),
 	)
 
 	return nil
@@ -130,7 +127,7 @@ func (ir *UsedInMemoryRepository) Update(ctx context.Context, s *core.Used) erro
 func (ir *UsedInMemoryRepository) Remove(ctx context.Context, id int) error {
 	const op = "UsedInMemoryRepository.Remove"
 
-	used, err := ir.list.ByID(id)
+	_, err := ir.list.ByID(id)
 	if err != nil {
 		if errors.Is(err, repoerrors.ErrNotFound) {
 			ir.logger.Info(
@@ -145,7 +142,7 @@ func (ir *UsedInMemoryRepository) Remove(ctx context.Context, id int) error {
 			"Failed to retrieve used",
 			slog.String("op", op),
 			slog.Int("used id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -156,7 +153,6 @@ func (ir *UsedInMemoryRepository) Remove(ctx context.Context, id int) error {
 		"Used successfully removed",
 		slog.String("op", op),
 		slog.Int("used id", id),
-		slog.Any("used", *used),
 	)
 
 	return nil

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
@@ -41,10 +40,9 @@ func NewSimSQLRepository(db *sql.DB, logger *slog.Logger) *SimSQL {
 func (ss *SimSQL) Add(ctx context.Context, number string, provider *core.Provider, isActivated bool, activateUntil int64, isBlocked bool) (int, error) {
 	const op = "SimSQL.Add"
 
-	query := `CALL InsertSim(?,?,?,?,?,@lastId);`
-
 	var insertedId int
 
+	query := `CALL InsertSim(?,?,?,?,?,@lastId)`
 	_, err := ss.db.ExecContext(ctx, query, number, provider.Id(), isActivated, activateUntil, isBlocked)
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
@@ -63,17 +61,16 @@ func (ss *SimSQL) Add(ctx context.Context, number string, provider *core.Provide
 			return 0, repoerrors.ErrAlreadyExists
 		}
 
-		ss.logger.Info(
+		ss.logger.Error(
 			"Failed to add sim",
 			slog.String("op", op),
 			slog.String("query", query),
-			"err", err,
+			sl.Err(err),
 		)
 		return 0, err
 	}
+
 	if err := ss.db.QueryRowContext(ctx, "SELECT @lastId").Scan(&insertedId); err != nil {
-		fmt.Println("inner error: ", err)
-		// validate is that already exist erro from sql
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 
@@ -89,6 +86,13 @@ func (ss *SimSQL) Add(ctx context.Context, number string, provider *core.Provide
 
 			return 0, repoerrors.ErrAlreadyExists
 		}
+
+		ss.logger.Error(
+			"Failed to add sim",
+			slog.String("op", op),
+			slog.String("query", query),
+			sl.Err(err),
+		)
 
 		return 0, err
 	}
@@ -122,7 +126,7 @@ func (ss *SimSQL) Remove(ctx context.Context, id int) (err error) {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("sim id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -134,7 +138,7 @@ func (ss *SimSQL) Remove(ctx context.Context, id int) (err error) {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("sim id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -173,7 +177,7 @@ func (ss *SimSQL) GetList(ctx context.Context) (*core.List[*core.Sim], error) {
 			"Failed to get sim list",
 			slog.String("op", op),
 			slog.String("query", query),
-			"err", err,
+			sl.Err(err),
 		)
 	}
 
@@ -195,7 +199,7 @@ func (ss *SimSQL) GetList(ctx context.Context) (*core.List[*core.Sim], error) {
 				"Failed to scan sim",
 				slog.String("op", op),
 				slog.String("query", query),
-				"err", err,
+				sl.Err(err),
 			)
 			return nil, err
 		}
@@ -239,15 +243,13 @@ func (ss *SimSQL) Update(ctx context.Context, s *core.Sim) error {
 			"Failed to update sim",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.Group("in",
-				slog.Int("sim id", s.Id()),
-				slog.Int("provider id", s.Provider().Id()),
-				slog.String("provider name", s.Provider().Name()),
-				slog.String("number", s.Number()),
-				slog.Bool("isActivated", s.IsActivated()),
-				slog.Int64("activateUntil", s.ActivateUntil()),
-				slog.Bool("isBlocked", s.IsBlocked()),
-			),
+			slog.Int("sim id", s.Id()),
+			slog.Int("provider id", s.Provider().Id()),
+			slog.String("provider name", s.Provider().Name()),
+			slog.String("number", s.Number()),
+			slog.Bool("isActivated", s.IsActivated()),
+			slog.Int64("activateUntil", s.ActivateUntil()),
+			slog.Bool("isBlocked", s.IsBlocked()),
 			sl.Err(err),
 		)
 		return err
@@ -256,15 +258,13 @@ func (ss *SimSQL) Update(ctx context.Context, s *core.Sim) error {
 	ss.logger.Info(
 		"Sim successfully updated",
 		slog.String("op", op),
-		slog.Group("in",
-			slog.Int("sim id", s.Id()),
-			slog.Int("provider id", s.Provider().Id()),
-			slog.String("provider name", s.Provider().Name()),
-			slog.String("number", s.Number()),
-			slog.Bool("isActivated", s.IsActivated()),
-			slog.Int64("activateUntil", s.ActivateUntil()),
-			slog.Bool("isBlocked", s.IsBlocked()),
-		),
+		slog.Int("sim id", s.Id()),
+		slog.Int("provider id", s.Provider().Id()),
+		slog.String("provider name", s.Provider().Name()),
+		slog.String("number", s.Number()),
+		slog.Bool("isActivated", s.IsActivated()),
+		slog.Int64("activateUntil", s.ActivateUntil()),
+		slog.Bool("isBlocked", s.IsBlocked()),
 	)
 
 	return nil
@@ -306,7 +306,7 @@ func (ss *SimSQL) ByID(ctx context.Context, id int) (*core.Sim, error) {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("sim id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}

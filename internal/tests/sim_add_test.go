@@ -25,7 +25,7 @@ func TestAddSim_HappyPath(t *testing.T) {
 
 	phone := suite.GenerateFakePhoneNumber()
 	activateUntil := suite.GenerateFakeDateUnix()
-	provider := core.Provider{}.WithName(gofakeit.BS())
+	provider := core.Provider{}.WithName(suite.GenerateFakeString(16))
 
 	resp, err := st.SimClient.AddSim(
 		ctx,
@@ -80,7 +80,7 @@ func TestAddSim_DuplicateSim(t *testing.T) {
 	ctx, ss := suite.NewSuite(t)
 	phone := suite.GenerateFakePhoneNumber()
 	activateUntil := suite.GenerateFakeDateUnix()
-	provider := core.Provider{}.WithName(gofakeit.BS())
+	provider := core.Provider{}.WithName(suite.GenerateFakeString(16))
 
 	resp, err := ss.SimClient.AddSim(
 		ctx,
@@ -130,7 +130,7 @@ func TestAddSim_FailCases(t *testing.T) {
 
 	ctx, s := suite.NewSuite(t)
 
-	provider := gofakeit.BS()
+	provider := suite.GenerateFakeString(16)
 	randomNumber := suite.GenerateFakePhoneNumber()
 
 	tests := []struct {

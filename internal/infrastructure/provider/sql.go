@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -49,7 +50,7 @@ func (ps *ProviderSQL) Add(ctx context.Context, name string) (int, error) {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.String("provider name", name),
-			"err", err,
+			sl.Err(err),
 		)
 		return 0, err
 	}
@@ -61,7 +62,7 @@ func (ps *ProviderSQL) Add(ctx context.Context, name string) (int, error) {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.String("provider name", name),
-			"err", err,
+			sl.Err(err),
 		)
 		return 0, err
 	}
@@ -78,7 +79,7 @@ func (ps *ProviderSQL) GetList(ctx context.Context) (*core.List[*core.Provider],
 			"Failed to get provider list",
 			slog.String("op", op),
 			slog.String("query", query),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (ps *ProviderSQL) GetList(ctx context.Context) (*core.List[*core.Provider],
 				"Failed to scan provider row",
 				slog.String("op", op),
 				slog.String("query", query),
-				"err", err,
+				sl.Err(err),
 			)
 			return nil, err
 		}
@@ -134,7 +135,7 @@ func (ps *ProviderSQL) ByID(ctx context.Context, id int) (*core.Provider, error)
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("provider id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -179,7 +180,7 @@ func (ps *ProviderSQL) ByName(ctx context.Context, name string) (*core.Provider,
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.String("provider name", name),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -211,7 +212,7 @@ func (ps *ProviderSQL) Remove(ctx context.Context, id int) error {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("provider id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -223,7 +224,7 @@ func (ps *ProviderSQL) Remove(ctx context.Context, id int) error {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("provider id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}

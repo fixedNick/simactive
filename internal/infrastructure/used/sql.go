@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -37,12 +38,10 @@ func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, 
 				"Used service already exists",
 				slog.String("op", op),
 				slog.String("query", query),
-				slog.Group("in",
-					slog.Int("sim id", simId),
-					slog.Int("service id", serviceId),
-					slog.Bool("is blocked", isBlocked),
-					slog.String("blocked info", blockedInfo),
-				),
+				slog.Int("sim id", simId),
+				slog.Int("service id", serviceId),
+				slog.Bool("is blocked", isBlocked),
+				slog.String("blocked info", blockedInfo),
 			)
 			return 0, repoerrors.ErrAlreadyExists
 		}
@@ -51,12 +50,11 @@ func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, 
 			"Failed to add used service",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.Group("in", slog.Int("sim id", simId),
-				slog.Int("service id", serviceId),
-				slog.Bool("is blocked", isBlocked),
-				slog.String("blocked info", blockedInfo),
-			),
-			slog.String("error", err.Error()),
+			slog.Int("sim id", simId),
+			slog.Int("service id", serviceId),
+			slog.Bool("is blocked", isBlocked),
+			slog.String("blocked info", blockedInfo),
+			sl.Err(err),
 		)
 		return 0, err
 	}
@@ -67,12 +65,11 @@ func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, 
 			"Failed to get last insert id",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.Group("in", slog.Int("sim id", simId),
-				slog.Int("service id", serviceId),
-				slog.Bool("is blocked", isBlocked),
-				slog.String("blocked info", blockedInfo),
-			),
-			slog.String("error", err.Error()),
+			slog.Int("sim id", simId),
+			slog.Int("service id", serviceId),
+			slog.Bool("is blocked", isBlocked),
+			slog.String("blocked info", blockedInfo),
+			sl.Err(err),
 		)
 		return 0, err
 	}
@@ -97,7 +94,7 @@ func (ur *UsedSQLRepository) GetList(ctx context.Context) (*core.List[*core.Used
 			"Failed to get used service list",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.String("error", err.Error()),
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -117,7 +114,7 @@ func (ur *UsedSQLRepository) GetList(ctx context.Context) (*core.List[*core.Used
 				"Failed to scan used service",
 				slog.String("op", op),
 				slog.String("query", query),
-				slog.String("error", err.Error()),
+				sl.Err(err),
 			)
 			return nil, err
 		}
@@ -161,7 +158,7 @@ func (ur *UsedSQLRepository) ByID(ctx context.Context, id int) (*core.Used, erro
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("id", id),
-			slog.String("error", err.Error()),
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -171,7 +168,6 @@ func (ur *UsedSQLRepository) ByID(ctx context.Context, id int) (*core.Used, erro
 		slog.String("op", op),
 		slog.String("query", query),
 		slog.Int("id", id),
-		slog.Any("used", used),
 	)
 
 	return &used, nil
@@ -188,7 +184,7 @@ func (ur *UsedSQLRepository) Update(ctx context.Context, s *core.Used) error {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Any("used", s),
-			slog.String("error", err.Error()),
+			sl.Err(err),
 		)
 		return err
 	}
@@ -196,7 +192,6 @@ func (ur *UsedSQLRepository) Update(ctx context.Context, s *core.Used) error {
 		"Used service successfully updated",
 		slog.String("op", op),
 		slog.String("query", query),
-		slog.Any("used", s),
 	)
 	return nil
 }
@@ -211,7 +206,7 @@ func (ur *UsedSQLRepository) Remove(ctx context.Context, id int) error {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("id", id),
-			slog.String("error", err.Error()),
+			sl.Err(err),
 		)
 		return err
 	}
@@ -223,7 +218,7 @@ func (ur *UsedSQLRepository) Remove(ctx context.Context, id int) error {
 			slog.String("op", op),
 			slog.String("query", query),
 			slog.Int("id", id),
-			slog.String("error", err.Error()),
+			sl.Err(err),
 		)
 		return err
 	}

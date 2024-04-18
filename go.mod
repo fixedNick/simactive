@@ -5,6 +5,7 @@ go 1.22.1
 require (
 	github.com/brianvoe/gofakeit v2.2.0+incompatible
 	github.com/ilyakaznacheev/cleanenv v1.5.0
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )
@@ -12,11 +13,14 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 )
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/fatih/color v1.16.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 )
 
 // SimInMemory is a repository that stores SIM cards in memory.
@@ -43,15 +44,13 @@ func (i *SimInMemory) Add(ctx context.Context, simId int, number string, provide
 			"Sim already exists",
 			slog.String("op", op),
 			slog.Any("sim", *sim),
-			slog.Group("in",
-				slog.Int("sim id", simId),
-				slog.String("number", number),
-				slog.Int("provider id", provider.Id()),
-				slog.String("provider name", provider.Name()),
-				slog.Bool("isActivated", isActivated),
-				slog.Int64("activateUntil", activateUntil),
-				slog.Bool("isBlocked", isBlocked),
-			),
+			slog.Int("sim id", simId),
+			slog.String("number", number),
+			slog.Int("provider id", provider.Id()),
+			slog.String("provider name", provider.Name()),
+			slog.Bool("isActivated", isActivated),
+			slog.Int64("activateUntil", activateUntil),
+			slog.Bool("isBlocked", isBlocked),
 		)
 
 		return repoerrors.ErrAlreadyExists
@@ -63,15 +62,13 @@ func (i *SimInMemory) Add(ctx context.Context, simId int, number string, provide
 	i.logger.Info(
 		"Sim successfully added",
 		slog.String("op", op),
-		slog.Group("in",
-			slog.Int("sim id", simId),
-			slog.String("number", number),
-			slog.Int("provider id", provider.Id()),
-			slog.String("provider name", provider.Name()),
-			slog.Bool("isActivated", isActivated),
-			slog.Int64("activateUntil", activateUntil),
-			slog.Bool("isBlocked", isBlocked),
-		),
+		slog.Int("sim id", simId),
+		slog.String("number", number),
+		slog.Int("provider id", provider.Id()),
+		slog.String("provider name", provider.Name()),
+		slog.Bool("isActivated", isActivated),
+		slog.Int64("activateUntil", activateUntil),
+		slog.Bool("isBlocked", isBlocked),
 	)
 	return nil
 }
@@ -80,10 +77,10 @@ func (i *SimInMemory) Add(ctx context.Context, simId int, number string, provide
 //
 // ctx context.Context, id int
 // error
-func (i *SimInMemory) Remove(ctx context.Context, id int) (err error) {
+func (i *SimInMemory) Remove(ctx context.Context, id int) error {
 	const op = "SimInMemory.Remove"
 
-	sim, err := i.list.ByID(id)
+	_, err := i.list.ByID(id)
 
 	if err != nil {
 		if errors.Is(err, repoerrors.ErrNotFound) {
@@ -98,7 +95,7 @@ func (i *SimInMemory) Remove(ctx context.Context, id int) (err error) {
 		i.logger.Error("Failed to retrieve sim",
 			slog.String("op", op),
 			slog.Int("sim id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -109,7 +106,6 @@ func (i *SimInMemory) Remove(ctx context.Context, id int) (err error) {
 		"Sim successfully removed",
 		slog.String("op", op),
 		slog.Int("sim id", id),
-		slog.Any("sim", *sim),
 	)
 	return nil
 }
@@ -150,7 +146,7 @@ func (i *SimInMemory) Update(ctx context.Context, s *core.Sim) error {
 		i.logger.Error("Failed to retrieve sim",
 			slog.String("op", op),
 			slog.Int("sim id", s.Id()),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -183,7 +179,7 @@ func (i *SimInMemory) ByID(ctx context.Context, id int) (*core.Sim, error) {
 		i.logger.Error("Failed to retrieve sim",
 			slog.String("op", op),
 			slog.Int("sim id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}

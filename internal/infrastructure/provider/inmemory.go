@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 )
 
 type ProviderInMemory struct {
@@ -98,7 +99,7 @@ func (im *ProviderInMemory) ByID(ctx context.Context, id int) (*core.Provider, e
 			"Failed to retrieve provider",
 			slog.String("op", op),
 			slog.Int("provider id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return nil, err
 	}
@@ -138,7 +139,6 @@ func (im *ProviderInMemory) ByName(ctx context.Context, name string) (*core.Prov
 		"Provider successfully retrieved",
 		slog.String("op", op),
 		slog.String("provider name", name),
-		slog.Any("provider", *provider),
 	)
 	return provider, nil
 }
@@ -148,7 +148,7 @@ func (im *ProviderInMemory) ByName(ctx context.Context, name string) (*core.Prov
 func (im *ProviderInMemory) Remove(ctx context.Context, id int) error {
 	const op = "ProviderInMemory.Remove"
 
-	provider, err := im.list.ByID(id)
+	_, err := im.list.ByID(id)
 
 	if err != nil {
 		if errors.Is(err, repoerrors.ErrNotFound) {
@@ -164,7 +164,7 @@ func (im *ProviderInMemory) Remove(ctx context.Context, id int) error {
 			"Failed to retrieve provider",
 			slog.String("op", op),
 			slog.Int("provider id", id),
-			"err", err,
+			sl.Err(err),
 		)
 		return err
 	}
@@ -175,7 +175,6 @@ func (im *ProviderInMemory) Remove(ctx context.Context, id int) error {
 		"Provider successfully removed",
 		slog.String("op", op),
 		slog.Int("provider id", id),
-		slog.Any("provider", *provider),
 	)
 	return nil
 }
