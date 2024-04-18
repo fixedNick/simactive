@@ -23,20 +23,17 @@ func NewUsedInMemoryRepository(logger *slog.Logger) *UsedInMemoryRepository {
 func (ir *UsedInMemoryRepository) Add(ctx context.Context, id int, simId int, serviceId int, isBlocked bool, blockedInfo string) error {
 	const op = "UsedInMemoryRepository.Add"
 
-	inParameters := []any{
-		slog.Int("id", id),
-		slog.Int("sim id", simId),
-		slog.Int("service id", serviceId),
-		slog.Bool("is blocked", isBlocked),
-		slog.String("blocked info", blockedInfo),
-	}
-
 	if _, err := ir.list.ByID(id); err == nil {
 
 		ir.logger.Info(
 			"Used already exists",
 			slog.String("op", op),
-			slog.Group("in", inParameters...),
+			slog.Group("in", slog.Int("id", id),
+				slog.Int("sim id", simId),
+				slog.Int("service id", serviceId),
+				slog.Bool("is blocked", isBlocked),
+				slog.String("blocked info", blockedInfo),
+			),
 		)
 		return repoerrors.ErrAlreadyExists
 	}
@@ -47,7 +44,12 @@ func (ir *UsedInMemoryRepository) Add(ctx context.Context, id int, simId int, se
 	ir.logger.Info(
 		"Used added",
 		slog.String("op", op),
-		slog.Group("in", inParameters...),
+		slog.Group("in", slog.Int("id", id),
+			slog.Int("sim id", simId),
+			slog.Int("service id", serviceId),
+			slog.Bool("is blocked", isBlocked),
+			slog.String("blocked info", blockedInfo),
+		),
 	)
 	return nil
 }

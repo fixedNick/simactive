@@ -26,13 +26,6 @@ func NewUsedSQLRepository(db *sql.DB, logger *slog.Logger) *UsedSQLRepository {
 func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, isBlocked bool, blockedInfo string) (int, error) {
 	const op = "UsedSQLRepository.Add"
 
-	inParameters := []any{
-		slog.Int("sim id", simId),
-		slog.Int("service id", serviceId),
-		slog.Bool("is blocked", isBlocked),
-		slog.String("blocked info", blockedInfo),
-	}
-
 	query := `INSERT INTO used_services (sim_id, service_id, is_blocked, blocked_info) VALUES (?, ?, ?, ?);`
 
 	res, err := ur.db.ExecContext(ctx, query, simId, serviceId, isBlocked, blockedInfo)
@@ -44,7 +37,12 @@ func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, 
 				"Used service already exists",
 				slog.String("op", op),
 				slog.String("query", query),
-				slog.Group("in", inParameters...),
+				slog.Group("in",
+					slog.Int("sim id", simId),
+					slog.Int("service id", serviceId),
+					slog.Bool("is blocked", isBlocked),
+					slog.String("blocked info", blockedInfo),
+				),
 			)
 			return 0, repoerrors.ErrAlreadyExists
 		}
@@ -53,7 +51,11 @@ func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, 
 			"Failed to add used service",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.Group("in", inParameters...),
+			slog.Group("in", slog.Int("sim id", simId),
+				slog.Int("service id", serviceId),
+				slog.Bool("is blocked", isBlocked),
+				slog.String("blocked info", blockedInfo),
+			),
 			slog.String("error", err.Error()),
 		)
 		return 0, err
@@ -65,7 +67,11 @@ func (ur *UsedSQLRepository) Add(ctx context.Context, simId int, serviceId int, 
 			"Failed to get last insert id",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.Group("in", inParameters...),
+			slog.Group("in", slog.Int("sim id", simId),
+				slog.Int("service id", serviceId),
+				slog.Bool("is blocked", isBlocked),
+				slog.String("blocked info", blockedInfo),
+			),
 			slog.String("error", err.Error()),
 		)
 		return 0, err

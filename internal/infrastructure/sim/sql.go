@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"simactive/internal/core"
 	"simactive/internal/infrastructure/repoerrors"
+	"simactive/internal/lib/logger/sl"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -227,16 +228,6 @@ func (ss *SimSQL) GetList(ctx context.Context) (*core.List[*core.Sim], error) {
 func (ss *SimSQL) Update(ctx context.Context, s *core.Sim) error {
 	const op = "SimSQL.Update"
 
-	logSimInfo := []any{
-		slog.Int("sim id", s.Id()),
-		slog.Int("provider id", s.Provider().Id()),
-		slog.String("provider name", s.Provider().Name()),
-		slog.String("number", s.Number()),
-		slog.Bool("isActivated", s.IsActivated()),
-		slog.Int64("activateUntil", s.ActivateUntil()),
-		slog.Bool("isBlocked", s.IsBlocked()),
-	}
-
 	query := "UPDATE sim SET number = ?, provider_id = ?, is_activated = ?, activate_until = ?, is_blocked = ? WHERE id = ?"
 	_, err := ss.db.ExecContext(ctx, query, s.Number(), s.Provider().Id(), s.IsActivated(), s.ActivateUntil(), s.IsBlocked(), s.Id())
 	if err != nil {
@@ -248,8 +239,16 @@ func (ss *SimSQL) Update(ctx context.Context, s *core.Sim) error {
 			"Failed to update sim",
 			slog.String("op", op),
 			slog.String("query", query),
-			slog.Group("sim info", logSimInfo...),
-			"err", err,
+			slog.Group("in",
+				slog.Int("sim id", s.Id()),
+				slog.Int("provider id", s.Provider().Id()),
+				slog.String("provider name", s.Provider().Name()),
+				slog.String("number", s.Number()),
+				slog.Bool("isActivated", s.IsActivated()),
+				slog.Int64("activateUntil", s.ActivateUntil()),
+				slog.Bool("isBlocked", s.IsBlocked()),
+			),
+			sl.Err(err),
 		)
 		return err
 	}
@@ -257,8 +256,17 @@ func (ss *SimSQL) Update(ctx context.Context, s *core.Sim) error {
 	ss.logger.Info(
 		"Sim successfully updated",
 		slog.String("op", op),
-		slog.Group("sim info", logSimInfo...),
+		slog.Group("in",
+			slog.Int("sim id", s.Id()),
+			slog.Int("provider id", s.Provider().Id()),
+			slog.String("provider name", s.Provider().Name()),
+			slog.String("number", s.Number()),
+			slog.Bool("isActivated", s.IsActivated()),
+			slog.Int64("activateUntil", s.ActivateUntil()),
+			slog.Bool("isBlocked", s.IsBlocked()),
+		),
 	)
+
 	return nil
 }
 

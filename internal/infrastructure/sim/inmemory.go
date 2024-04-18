@@ -37,23 +37,22 @@ func NewSimInMemoryRepository(logger *slog.Logger) *SimInMemory {
 func (i *SimInMemory) Add(ctx context.Context, simId int, number string, provider *core.Provider, isActivated bool, activateUntil int64, isBlocked bool) (err error) {
 	const op = "SimInMemory.Add"
 
-	inParameters := []any{
-		slog.Int("sim id", simId),
-		slog.String("number", number),
-		slog.Int("provider id", provider.Id()),
-		slog.String("provider name", provider.Name()),
-		slog.Bool("isActivated", isActivated),
-		slog.Int64("activateUntil", activateUntil),
-		slog.Bool("isBlocked", isBlocked),
-	}
-
 	if sim, err := i.list.ByID(simId); err == nil {
 
 		i.logger.Info(
 			"Sim already exists",
 			slog.String("op", op),
 			slog.Any("sim", *sim),
-			slog.Group("in", inParameters...))
+			slog.Group("in",
+				slog.Int("sim id", simId),
+				slog.String("number", number),
+				slog.Int("provider id", provider.Id()),
+				slog.String("provider name", provider.Name()),
+				slog.Bool("isActivated", isActivated),
+				slog.Int64("activateUntil", activateUntil),
+				slog.Bool("isBlocked", isBlocked),
+			),
+		)
 
 		return repoerrors.ErrAlreadyExists
 	}
@@ -64,7 +63,15 @@ func (i *SimInMemory) Add(ctx context.Context, simId int, number string, provide
 	i.logger.Info(
 		"Sim successfully added",
 		slog.String("op", op),
-		slog.Group("in", inParameters...),
+		slog.Group("in",
+			slog.Int("sim id", simId),
+			slog.String("number", number),
+			slog.Int("provider id", provider.Id()),
+			slog.String("provider name", provider.Name()),
+			slog.Bool("isActivated", isActivated),
+			slog.Int64("activateUntil", activateUntil),
+			slog.Bool("isBlocked", isBlocked),
+		),
 	)
 	return nil
 }
