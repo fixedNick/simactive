@@ -7,13 +7,20 @@ type Provider struct {
 	name string
 }
 
+func NewProvider(id int, name string) Provider {
+	return Provider{
+		id:   id,
+		name: name,
+	}
+}
+
 ///  Getters
 
-func (p *Provider) Id() int {
+func (p Provider) Id() int {
 	return p.id
 }
 
-func (p *Provider) Name() string {
+func (p Provider) Name() string {
 	return p.name
 }
 
@@ -45,4 +52,9 @@ func (p *Provider) GetKey() int {
 
 func (p *Provider) SetKey(id int) {
 	p.id = id
+}
+
+func (p Provider) WithName(name string) Provider {
+	p.name = name
+	return p
 }

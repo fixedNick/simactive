@@ -8,7 +8,7 @@ import (
 
 func MustInit() *sql.DB {
 
-	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/simactive")
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/simactive")
 
 	// if there is an error opening the connection, handle it
 	if err != nil {

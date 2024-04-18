@@ -6,7 +6,7 @@ import (
 	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
 	"simactive/internal/core"
-	"simactive/internal/repository"
+	"simactive/internal/infrastructure/repoerrors"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -56,7 +56,7 @@ func (gss GRPCServiceService) AddService(ctx context.Context, req *pb.AddService
 
 	id, err := gss.serviceService.Add(ctx, &service)
 	if err != nil {
-		if err == repository.ErrAlreadyExists {
+		if err == repoerrors.ErrAlreadyExists {
 			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("service with name %s already exists", name))
 		}
 		return nil, err
@@ -86,7 +86,7 @@ func (gss GRPCServiceService) DeleteService(ctx context.Context, req *pb.DeleteS
 
 	err := gss.serviceService.Remove(ctx, id)
 	if err != nil {
-		if errors.Is(err, repository.ErrNotFound) {
+		if errors.Is(err, repoerrors.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "service with id %d not found", id)
 		}
 		return nil, err

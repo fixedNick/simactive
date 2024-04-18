@@ -24,10 +24,11 @@ func TestActivateSim_HappyPath(t *testing.T) {
 	// activate sim
 	// check that sim is activated
 
+	fakeProvider := core.Provider{}.WithName(gofakeit.BS())
 	sim := core.NewSim(
 		0,
 		suite.GenerateFakePhoneNumber(),
-		gofakeit.Number(1, 999),
+		&fakeProvider,
 		false,
 		suite.GenerateFakeDateUnix(),
 		gofakeit.Bool(),
@@ -36,7 +37,7 @@ func TestActivateSim_HappyPath(t *testing.T) {
 	resp, err := s.SimClient.AddSim(ctx, &pb.AddSimRequest{
 		SimData: &pb.AddSimData{
 			Number:        sim.Number(),
-			ProviderID:    int32(sim.ProviderID()),
+			ProviderName:  sim.Provider().Name(),
 			IsActivated:   sim.IsActivated(),
 			ActivateUntil: sim.ActivateUntil(),
 			IsBlocked:     sim.IsBlocked(),

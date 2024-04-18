@@ -21,6 +21,7 @@ type Suite struct {
 	Cfg           config.Config
 	SimClient     SimHelper.SimClient
 	ServiceClient SimHelper.ServiceClient
+	UsedClient    SimHelper.UsedClient
 }
 
 const (
@@ -56,6 +57,7 @@ func NewSuite(t *testing.T) (context.Context, *Suite) {
 		Cfg:           *cfg,
 		SimClient:     SimHelper.NewSimClient(cc),
 		ServiceClient: SimHelper.NewServiceClient(cc),
+		UsedClient:    SimHelper.NewUsedClient(cc),
 	}
 }
 func grpcArrdress(cfg config.Config) string {

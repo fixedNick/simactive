@@ -1,5 +1,8 @@
 package tests
 
+// TODO
+// In adding new sim we have to check that this sim have valid PROVIDER id and name
+
 import (
 	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
@@ -19,7 +22,7 @@ func TestAddService_HappyPath(t *testing.T) {
 
 	ctx, s := suite.NewSuite(t)
 
-	serviceName := gofakeit.BeerName()
+	serviceName := gofakeit.BS()
 
 	respAdd, err := s.ServiceClient.AddService(ctx, &pb.AddServiceRequest{Name: serviceName})
 

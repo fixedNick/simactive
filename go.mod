@@ -3,6 +3,7 @@ module simactive
 go 1.22.1
 
 require (
+	github.com/brianvoe/gofakeit v2.2.0+incompatible
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
@@ -10,10 +11,8 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/brianvoe/gofakeit v2.2.0+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.5.2 // indirect
 )
 
 require (

@@ -35,11 +35,16 @@ message SSBRequest {
 message SSBResponse {
     bool isBlocked = 1;
 }
+message UsedService {
+    int32 serviceId = 1;
+    bool isBlocked = 2;
+    string blockedInfo = 3;
+}
 message GetUsedServResponse {
-    repeated int32 UsedServiceIds = 1;
+    repeated UsedService UsedServices = 1;
 }
 message GetUsedServRequest {
-    string Number = 1;
+    int32 simId = 1;
 }
 message GetFreeServResponse {
     repeated int32 FreeServiceIds = 1;
@@ -60,7 +65,7 @@ message SimList {
 message SimData {
     int32 ID = 1;
     string Number = 2;
-    int32 ProviderID = 3;
+    ProviderData Provider = 3;
     bool IsActivated = 4;
     int64 ActivateUntil = 5;
     bool IsBlocked = 6;
@@ -100,7 +105,7 @@ message DeleteServiceResponse {
 }
 message AddSimData {
     string Number = 1;
-    int32 ProviderID = 2;
+    string ProviderName = 2;
     bool IsActivated = 3;
     int64 ActivateUntil = 4;
     bool IsBlocked = 5;

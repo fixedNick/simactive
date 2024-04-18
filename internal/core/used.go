@@ -12,6 +12,16 @@ type Used struct {
 	blockedInfo string
 }
 
+func NewUsed(id, simId, serviceId int, isBlocked bool, blockedInfo string) Used {
+	return Used{
+		id:          id,
+		simId:       simId,
+		serviceId:   serviceId,
+		isBlocked:   isBlocked,
+		blockedInfo: blockedInfo,
+	}
+}
+
 /// Getters
 
 func (u *Used) Id() int {

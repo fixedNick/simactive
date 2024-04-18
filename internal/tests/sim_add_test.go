@@ -3,7 +3,9 @@ package tests
 import (
 	"fmt"
 	pb "simactive/api/generated/github.com/fixedNick/SimHelper"
+	"simactive/internal/core"
 	"simactive/internal/tests/suite"
+	"slices"
 	"testing"
 
 	"google.golang.org/grpc/codes"
@@ -23,13 +25,14 @@ func TestAddSim_HappyPath(t *testing.T) {
 
 	phone := suite.GenerateFakePhoneNumber()
 	activateUntil := suite.GenerateFakeDateUnix()
+	provider := core.Provider{}.WithName(gofakeit.BS())
 
 	resp, err := st.SimClient.AddSim(
 		ctx,
 		&pb.AddSimRequest{
 			SimData: &pb.AddSimData{
 				Number:        phone,
-				ProviderID:    1,
+				ProviderName:  provider.Name(),
 				IsActivated:   false,
 				ActivateUntil: activateUntil,
 				IsBlocked:     false,
@@ -42,9 +45,12 @@ func TestAddSim_HappyPath(t *testing.T) {
 	assert.NotEmpty(t, resp.Message)
 
 	expectedSimData := pb.SimData{
-		ID:            resp.Id,
-		Number:        phone,
-		ProviderID:    1,
+		ID:     resp.Id,
+		Number: phone,
+		Provider: &pb.ProviderData{
+			Id:   int32(provider.Id()),
+			Name: provider.Name(),
+		},
 		IsActivated:   false,
 		ActivateUntil: activateUntil,
 		IsBlocked:     false,
@@ -52,7 +58,17 @@ func TestAddSim_HappyPath(t *testing.T) {
 
 	r, err := st.SimClient.GetSimList(ctx, &pb.Empty{})
 	require.Nil(t, err)
-	assert.Contains(t, r.SimList, &expectedSimData)
+
+	contains := slices.ContainsFunc(r.SimList, func(s *pb.SimData) bool {
+		return s.Number == expectedSimData.Number &&
+			s.Provider.Name == expectedSimData.Provider.Name &&
+			s.ID == expectedSimData.ID &&
+			s.ActivateUntil == expectedSimData.ActivateUntil &&
+			s.IsActivated == expectedSimData.IsActivated &&
+			s.IsBlocked == expectedSimData.IsBlocked
+	})
+
+	assert.True(t, contains)
 }
 
 // TestAddSim_DuplicateSim is a test function for adding a duplicate sim.
@@ -64,13 +80,14 @@ func TestAddSim_DuplicateSim(t *testing.T) {
 	ctx, ss := suite.NewSuite(t)
 	phone := suite.GenerateFakePhoneNumber()
 	activateUntil := suite.GenerateFakeDateUnix()
+	provider := core.Provider{}.WithName(gofakeit.BS())
 
 	resp, err := ss.SimClient.AddSim(
 		ctx,
 		&pb.AddSimRequest{
 			SimData: &pb.AddSimData{
 				Number:        phone,
-				ProviderID:    1,
+				ProviderName:  provider.Name(),
 				IsActivated:   false,
 				ActivateUntil: activateUntil,
 				IsBlocked:     false,
@@ -86,7 +103,7 @@ func TestAddSim_DuplicateSim(t *testing.T) {
 		&pb.AddSimRequest{
 			SimData: &pb.AddSimData{
 				Number:        phone,
-				ProviderID:    1,
+				ProviderName:  provider.Name(),
 				IsActivated:   false,
 				ActivateUntil: activateUntil,
 				IsBlocked:     false,
@@ -113,42 +130,42 @@ func TestAddSim_FailCases(t *testing.T) {
 
 	ctx, s := suite.NewSuite(t)
 
-	provider := gofakeit.Number(1, 999)
+	provider := gofakeit.BS()
 	randomNumber := suite.GenerateFakePhoneNumber()
 
 	tests := []struct {
 		name               string
 		number             string
-		providerID         int
+		provider           string
 		expectedErr        string
 		expectedStatusCode codes.Code
 	}{
 		{
-			name:               "Add sim with 2empty phone number",
+			name:               "Add sim with empty phone number",
 			number:             "",
-			providerID:         provider,
+			provider:           provider,
 			expectedErr:        "Bad phone number.",
 			expectedStatusCode: codes.InvalidArgument,
 		},
 		{
 			name:               "Add sim with invalid phone number",
 			number:             "invalid",
-			providerID:         provider,
+			provider:           provider,
 			expectedErr:        "Bad phone number.",
 			expectedStatusCode: codes.InvalidArgument,
 		},
 		{
 			name:               "Add sim with too large phone number",
 			number:             "12312312312312312312312312312312312",
-			providerID:         provider,
+			provider:           provider,
 			expectedErr:        "Bad phone number.",
 			expectedStatusCode: codes.InvalidArgument,
 		},
 		{
-			name:               "Add sim with empty provider id",
+			name:               "Add sim with empty provider name",
 			number:             randomNumber,
-			providerID:         0,
-			expectedErr:        "Bad provider id.",
+			provider:           "",
+			expectedErr:        "Provider name is required.",
 			expectedStatusCode: codes.InvalidArgument,
 		},
 	}
@@ -158,7 +175,7 @@ func TestAddSim_FailCases(t *testing.T) {
 			_, err := s.SimClient.AddSim(ctx, &pb.AddSimRequest{
 				SimData: &pb.AddSimData{
 					Number:        tt.number,
-					ProviderID:    int32(tt.providerID),
+					ProviderName:  tt.provider,
 					IsActivated:   gofakeit.Bool(),
 					ActivateUntil: suite.GenerateFakeDateUnix(),
 					IsBlocked:     gofakeit.Bool(),

@@ -1,16 +1,14 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"log"
 	"log/slog"
 	"os"
 	"os/signal"
 	"simactive/internal/config"
-	"simactive/internal/core"
 	"simactive/internal/core/grpc"
-	"simactive/internal/repository"
+	repository "simactive/internal/infrastructure"
 	"simactive/internal/services"
 	coresql "simactive/internal/sql"
 	"syscall"
@@ -28,13 +26,14 @@ func main() {
 	db := coresql.MustInit()
 
 	// Init services
-	simService, serviceService, providerService, usedService := InitServices(db, logger)
+	repo := repository.NewRepository(logger, db)
+	simService, serviceService, providerService, usedService := InitServices(db, logger, repo)
 
 	// Init gRPC Server
 	gs := grpc.NewGRPCServer(cfg)
 	// Run gRPC server
 	go func() {
-		gs.MustRun(simService, serviceService, providerService, usedService)
+		gs.MustRun(logger, simService, serviceService, providerService, usedService)
 	}()
 
 	// gracefull shutdown
@@ -49,39 +48,15 @@ func main() {
 	log.Print("Gracefull shutdown")
 }
 
-func InitServices(db *sql.DB, logger *slog.Logger) (*services.SimService, *services.ServiceService, *services.ProviderService, *services.UsedService) {
+func InitServices(db *sql.DB, logger *slog.Logger, repo *repository.Repository) (*services.SimService, *services.ServiceService, *services.ProviderService, *services.UsedService) {
 
-	simService := services.NewSimService(
-		repository.NewRepository[*core.Sim](
-			context.Background(),
-			db,
-			logger,
-		),
-	)
+	simService := services.NewSimService(repo)
 
-	serviceService := services.NewServiceService(
-		repository.NewRepository[*core.Service](
-			context.Background(),
-			db,
-			logger,
-		),
-	)
+	serviceService := services.NewServiceService(repo)
 
-	providerService := services.NewProviderService(
-		repository.NewRepository[*core.Provider](
-			context.Background(),
-			db,
-			logger,
-		),
-	)
+	providerService := services.NewProviderService(repo)
 
-	usedService := services.NewUsedService(
-		repository.NewRepository[*core.Used](
-			context.Background(),
-			db,
-			logger,
-		),
-	)
+	usedService := services.NewUsedService(repo)
 
 	return simService, serviceService, providerService, usedService
 }
